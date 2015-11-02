@@ -1,0 +1,4975 @@
+// Compiled shader for PC, Mac & Linux Standalone, uncompressed size: 220.2KB
+
+// Skipping shader variants that would not be included into build of current scene.
+
+Shader "Legacy Shaders/Self-Illumin/Diffuse" {
+Properties {
+ _Color ("Main Color", Color) = (1,1,1,1)
+ _MainTex ("Base (RGB)", 2D) = "white" { }
+ _Illum ("Illumin (A)", 2D) = "white" { }
+}
+SubShader { 
+ LOD 200
+ Tags { "RenderType"="Opaque" }
+
+
+ // Stats for Vertex shader:
+ //       d3d11 : 46 avg math (35..58)
+ //    d3d11_9x : 49 avg math (35..63)
+ //        d3d9 : 45 avg math (28..62)
+ // Stats for Fragment shader:
+ //       d3d11 : 8 avg math (7..9), 2 avg texture (2..3)
+ //    d3d11_9x : 8 avg math (7..10), 2 texture
+ //        d3d9 : 11 avg math (11..12), 2 avg texture (2..3)
+ Pass {
+  Name "FORWARD"
+  Tags { "LIGHTMODE"="ForwardBase" "SHADOWSUPPORT"="true" "RenderType"="Opaque" }
+  GpuProgramID 42224
+Program "vp" {
+SubProgram "d3d9 " {
+// Stats: 28 math
+Keywords { "DIRECTIONAL" "SHADOWS_OFF" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" }
+Bind "vertex" Vertex
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+Matrix 4 [_Object2World] 3
+Matrix 7 [_World2Object] 3
+Matrix 0 [glstate_matrix_mvp]
+Vector 18 [_Illum_ST]
+Vector 17 [_MainTex_ST]
+Vector 12 [unity_SHAb]
+Vector 11 [unity_SHAg]
+Vector 10 [unity_SHAr]
+Vector 15 [unity_SHBb]
+Vector 14 [unity_SHBg]
+Vector 13 [unity_SHBr]
+Vector 16 [unity_SHC]
+"vs_2_0
+def c19, 1, 0, 0, 0
+dcl_position v0
+dcl_normal v1
+dcl_texcoord v2
+dp4 oPos.x, c0, v0
+dp4 oPos.y, c1, v0
+dp4 oPos.z, c2, v0
+dp4 oPos.w, c3, v0
+mad oT0.xy, v2, c17, c17.zwzw
+mad oT0.zw, v2.xyxy, c18.xyxy, c18
+dp4 oT2.x, c4, v0
+dp4 oT2.y, c5, v0
+dp4 oT2.z, c6, v0
+mul r0.xyz, v1.y, c8
+mad r0.xyz, c7, v1.x, r0
+mad r0.xyz, c9, v1.z, r0
+nrm r1.xyz, r0
+mul r0.x, r1.y, r1.y
+mad r0.x, r1.x, r1.x, -r0.x
+mul r2, r1.yzzx, r1.xyzz
+dp4 r3.x, c13, r2
+dp4 r3.y, c14, r2
+dp4 r3.z, c15, r2
+mad r0.xyz, c16, r0.x, r3
+mov r1.w, c19.x
+dp4 r2.x, c10, r1
+dp4 r2.y, c11, r1
+dp4 r2.z, c12, r1
+mov oT1.xyz, r1
+add oT3.xyz, r0, r2
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 35 math
+Keywords { "DIRECTIONAL" "SHADOWS_OFF" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 192
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityLighting" 720
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+BindCB  "UnityPerDraw" 2
+"vs_4_0
+root12:aaadaaaa
+eefiecedkhpgjnklhkpmghaaceonoogckngbfjbmabaaaaaacmahaaaaadaaaaaa
+cmaaaaaaceabaaaameabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheojiaaaaaaafaaaaaaaiaaaaaaiaaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaaimaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+apaaaaaaimaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaaimaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaaimaaaaaaadaaaaaaaaaaaaaa
+adaaaaaaaeaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfcee
+aaklklklfdeieefcgaafaaaaeaaaabaafiabaaaafjaaaaaeegiocaaaaaaaaaaa
+amaaaaaafjaaaaaeegiocaaaabaaaaaacnaaaaaafjaaaaaeegiocaaaacaaaaaa
+bdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaafpaaaaad
+dcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaadpccabaaa
+abaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaagfaaaaad
+hccabaaaaeaaaaaagiaaaaacaeaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaa
+aaaaaaaaegiocaaaacaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaa
+acaaaaaaaaaaaaaaagbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaa
+aaaaaaaaegiocaaaacaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaa
+dcaaaaakpccabaaaaaaaaaaaegiocaaaacaaaaaaadaaaaaapgbpbaaaaaaaaaaa
+egaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaaegiacaaa
+aaaaaaaaakaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaalmccabaaaabaaaaaa
+agbebaaaadaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaaaaaaaaaaalaaaaaa
+diaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaabaaaaaaa
+diaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaabbaaaaaa
+diaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaabcaaaaaa
+diaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaabaaaaaaa
+diaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaabbaaaaaa
+diaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaabcaaaaaa
+aaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaai
+bcaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabaaaaaaadiaaaaai
+ccaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabbaaaaaadiaaaaai
+ecaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabcaaaaaaaaaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaa
+dkaabaaaaaaaaaaadiaaaaahhcaabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaa
+aaaaaaaadgaaaaafhccabaaaacaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaa
+abaaaaaafgbfbaaaaaaaaaaaegiccaaaacaaaaaaanaaaaaadcaaaaakhcaabaaa
+abaaaaaaegiccaaaacaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaaabaaaaaa
+dcaaaaakhcaabaaaabaaaaaaegiccaaaacaaaaaaaoaaaaaakgbkbaaaaaaaaaaa
+egacbaaaabaaaaaadcaaaaakhccabaaaadaaaaaaegiccaaaacaaaaaaapaaaaaa
+pgbpbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaahbcaabaaaabaaaaaabkaabaaa
+aaaaaaaabkaabaaaaaaaaaaadcaaaaakbcaabaaaabaaaaaaakaabaaaaaaaaaaa
+akaabaaaaaaaaaaaakaabaiaebaaaaaaabaaaaaadiaaaaahpcaabaaaacaaaaaa
+jgacbaaaaaaaaaaaegakbaaaaaaaaaaabbaaaaaibcaabaaaadaaaaaaegiocaaa
+abaaaaaacjaaaaaaegaobaaaacaaaaaabbaaaaaiccaabaaaadaaaaaaegiocaaa
+abaaaaaackaaaaaaegaobaaaacaaaaaabbaaaaaiecaabaaaadaaaaaaegiocaaa
+abaaaaaaclaaaaaaegaobaaaacaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaa
+abaaaaaacmaaaaaaagaabaaaabaaaaaaegacbaaaadaaaaaadgaaaaaficaabaaa
+aaaaaaaaabeaaaaaaaaaiadpbbaaaaaibcaabaaaacaaaaaaegiocaaaabaaaaaa
+cgaaaaaaegaobaaaaaaaaaaabbaaaaaiccaabaaaacaaaaaaegiocaaaabaaaaaa
+chaaaaaaegaobaaaaaaaaaaabbaaaaaiecaabaaaacaaaaaaegiocaaaabaaaaaa
+ciaaaaaaegaobaaaaaaaaaaaaaaaaaahhccabaaaaeaaaaaaegacbaaaabaaaaaa
+egacbaaaacaaaaaadoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 35 math
+Keywords { "DIRECTIONAL" "SHADOWS_OFF" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 192
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityLighting" 720
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+BindCB  "UnityPerDraw" 2
+"vs_4_0_level_9_1
+root12:aaadaaaa
+eefiecedimlgnneoofipnpapfjehkejhlnpkkdmmabaaaaaaeaakaaaaaeaaaaaa
+daaaaaaaeaadaaaakiaiaaaakaajaaaaebgpgodjaiadaaaaaiadaaaaaaacpopp
+laacaaaafiaaaaaaaeaaceaaaaaafeaaaaaafeaaaaaaceaaabaafeaaaaaaakaa
+acaaabaaaaaaaaaaabaacgaaahaaadaaaaaaaaaaacaaaaaaaeaaakaaaaaaaaaa
+acaaamaaahaaaoaaaaaaaaaaaaaaaaaaaaacpoppfbaaaaafbfaaapkaaaaaiadp
+aaaaaaaaaaaaaaaaaaaaaaaabpaaaaacafaaaaiaaaaaapjabpaaaaacafaaacia
+acaaapjabpaaaaacafaaadiaadaaapjaaeaaaaaeaaaaadoaadaaoejaabaaoeka
+abaaookaaeaaaaaeaaaaamoaadaaeejaacaaeekaacaaoekaafaaaaadaaaaahia
+aaaaffjaapaaoekaaeaaaaaeaaaaahiaaoaaoekaaaaaaajaaaaaoeiaaeaaaaae
+aaaaahiabaaaoekaaaaakkjaaaaaoeiaaeaaaaaeacaaahoabbaaoekaaaaappja
+aaaaoeiaafaaaaadaaaaabiaacaaaajabcaaaakaafaaaaadaaaaaciaacaaaaja
+bdaaaakaafaaaaadaaaaaeiaacaaaajabeaaaakaafaaaaadabaaabiaacaaffja
+bcaaffkaafaaaaadabaaaciaacaaffjabdaaffkaafaaaaadabaaaeiaacaaffja
+beaaffkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaafaaaaadabaaabiaacaakkja
+bcaakkkaafaaaaadabaaaciaacaakkjabdaakkkaafaaaaadabaaaeiaacaakkja
+beaakkkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaceaaaaacabaaahiaaaaaoeia
+afaaaaadaaaaabiaabaaffiaabaaffiaaeaaaaaeaaaaabiaabaaaaiaabaaaaia
+aaaaaaibafaaaaadacaaapiaabaacjiaabaakeiaajaaaaadadaaabiaagaaoeka
+acaaoeiaajaaaaadadaaaciaahaaoekaacaaoeiaajaaaaadadaaaeiaaiaaoeka
+acaaoeiaaeaaaaaeaaaaahiaajaaoekaaaaaaaiaadaaoeiaabaaaaacabaaaiia
+bfaaaakaajaaaaadacaaabiaadaaoekaabaaoeiaajaaaaadacaaaciaaeaaoeka
+abaaoeiaajaaaaadacaaaeiaafaaoekaabaaoeiaabaaaaacabaaahoaabaaoeia
+acaaaaadadaaahoaaaaaoeiaacaaoeiaafaaaaadaaaaapiaaaaaffjaalaaoeka
+aeaaaaaeaaaaapiaakaaoekaaaaaaajaaaaaoeiaaeaaaaaeaaaaapiaamaaoeka
+aaaakkjaaaaaoeiaaeaaaaaeaaaaapiaanaaoekaaaaappjaaaaaoeiaaeaaaaae
+aaaaadmaaaaappiaaaaaoekaaaaaoeiaabaaaaacaaaaammaaaaaoeiappppaaaa
+fdeieefcgaafaaaaeaaaabaafiabaaaafjaaaaaeegiocaaaaaaaaaaaamaaaaaa
+fjaaaaaeegiocaaaabaaaaaacnaaaaaafjaaaaaeegiocaaaacaaaaaabdaaaaaa
+fpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaafpaaaaaddcbabaaa
+adaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaadpccabaaaabaaaaaa
+gfaaaaadhccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaagfaaaaadhccabaaa
+aeaaaaaagiaaaaacaeaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaa
+egiocaaaacaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaacaaaaaa
+aaaaaaaaagbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaa
+egiocaaaacaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaak
+pccabaaaaaaaaaaaegiocaaaacaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaa
+aaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaaegiacaaaaaaaaaaa
+akaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaalmccabaaaabaaaaaaagbebaaa
+adaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaaaaaaaaaaalaaaaaadiaaaaai
+bcaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaabaaaaaaadiaaaaai
+ccaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaabbaaaaaadiaaaaai
+ecaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaabcaaaaaadiaaaaai
+bcaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaabaaaaaaadiaaaaai
+ccaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaabbaaaaaadiaaaaai
+ecaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaabcaaaaaaaaaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaaibcaabaaa
+abaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabaaaaaaadiaaaaaiccaabaaa
+abaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabbaaaaaadiaaaaaiecaabaaa
+abaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabcaaaaaaaaaaaaahhcaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaaaaaaaaaa
+egacbaaaaaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaadkaabaaa
+aaaaaaaadiaaaaahhcaabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaa
+dgaaaaafhccabaaaacaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaaabaaaaaa
+fgbfbaaaaaaaaaaaegiccaaaacaaaaaaanaaaaaadcaaaaakhcaabaaaabaaaaaa
+egiccaaaacaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaaabaaaaaadcaaaaak
+hcaabaaaabaaaaaaegiccaaaacaaaaaaaoaaaaaakgbkbaaaaaaaaaaaegacbaaa
+abaaaaaadcaaaaakhccabaaaadaaaaaaegiccaaaacaaaaaaapaaaaaapgbpbaaa
+aaaaaaaaegacbaaaabaaaaaadiaaaaahbcaabaaaabaaaaaabkaabaaaaaaaaaaa
+bkaabaaaaaaaaaaadcaaaaakbcaabaaaabaaaaaaakaabaaaaaaaaaaaakaabaaa
+aaaaaaaaakaabaiaebaaaaaaabaaaaaadiaaaaahpcaabaaaacaaaaaajgacbaaa
+aaaaaaaaegakbaaaaaaaaaaabbaaaaaibcaabaaaadaaaaaaegiocaaaabaaaaaa
+cjaaaaaaegaobaaaacaaaaaabbaaaaaiccaabaaaadaaaaaaegiocaaaabaaaaaa
+ckaaaaaaegaobaaaacaaaaaabbaaaaaiecaabaaaadaaaaaaegiocaaaabaaaaaa
+claaaaaaegaobaaaacaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaabaaaaaa
+cmaaaaaaagaabaaaabaaaaaaegacbaaaadaaaaaadgaaaaaficaabaaaaaaaaaaa
+abeaaaaaaaaaiadpbbaaaaaibcaabaaaacaaaaaaegiocaaaabaaaaaacgaaaaaa
+egaobaaaaaaaaaaabbaaaaaiccaabaaaacaaaaaaegiocaaaabaaaaaachaaaaaa
+egaobaaaaaaaaaaabbaaaaaiecaabaaaacaaaaaaegiocaaaabaaaaaaciaaaaaa
+egaobaaaaaaaaaaaaaaaaaahhccabaaaaeaaaaaaegacbaaaabaaaaaaegacbaaa
+acaaaaaadoaaaaabejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaaaaaaaaaa
+aaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaaadaaaaaa
+abaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaaahahaaaa
+oaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaaabaaaaaa
+aaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaaadaaaaaa
+afaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaaapaaaaaa
+ojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdejfeejepeo
+aafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepemepfcaakl
+epfdeheojiaaaaaaafaaaaaaaiaaaaaaiaaaaaaaaaaaaaaaabaaaaaaadaaaaaa
+aaaaaaaaapaaaaaaimaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapaaaaaa
+imaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaaimaaaaaaacaaaaaa
+aaaaaaaaadaaaaaaadaaaaaaahaiaaaaimaaaaaaadaaaaaaaaaaaaaaadaaaaaa
+aeaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklkl
+"
+}
+SubProgram "d3d9 " {
+// Stats: 34 math
+Keywords { "DIRECTIONAL" "SHADOWS_SCREEN" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" }
+Bind "vertex" Vertex
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+Matrix 4 [_Object2World] 3
+Matrix 7 [_World2Object] 3
+Matrix 0 [glstate_matrix_mvp]
+Vector 20 [_Illum_ST]
+Vector 19 [_MainTex_ST]
+Vector 10 [_ProjectionParams]
+Vector 11 [_ScreenParams]
+Vector 14 [unity_SHAb]
+Vector 13 [unity_SHAg]
+Vector 12 [unity_SHAr]
+Vector 17 [unity_SHBb]
+Vector 16 [unity_SHBg]
+Vector 15 [unity_SHBr]
+Vector 18 [unity_SHC]
+"vs_2_0
+def c21, 1, 0.5, 0, 0
+dcl_position v0
+dcl_normal v1
+dcl_texcoord v2
+mad oT0.xy, v2, c19, c19.zwzw
+mad oT0.zw, v2.xyxy, c20.xyxy, c20
+dp4 oT2.x, c4, v0
+dp4 oT2.y, c5, v0
+dp4 oT2.z, c6, v0
+mul r0.xyz, v1.y, c8
+mad r0.xyz, c7, v1.x, r0
+mad r0.xyz, c9, v1.z, r0
+nrm r1.xyz, r0
+mul r0.x, r1.y, r1.y
+mad r0.x, r1.x, r1.x, -r0.x
+mul r2, r1.yzzx, r1.xyzz
+dp4 r3.x, c15, r2
+dp4 r3.y, c16, r2
+dp4 r3.z, c17, r2
+mad r0.xyz, c18, r0.x, r3
+mov r1.w, c21.x
+dp4 r2.x, c12, r1
+dp4 r2.y, c13, r1
+dp4 r2.z, c14, r1
+mov oT1.xyz, r1
+add oT3.xyz, r0, r2
+dp4 r0.y, c1, v0
+mul r1.x, r0.y, c10.x
+mul r1.w, r1.x, c21.y
+dp4 r0.x, c0, v0
+dp4 r0.w, c3, v0
+mul r1.xz, r0.xyww, c21.y
+mad oT4.xy, r1.z, c11.zwzw, r1.xwzw
+dp4 r0.z, c2, v0
+mov oPos, r0
+mov oT4.zw, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 38 math
+Keywords { "DIRECTIONAL" "SHADOWS_SCREEN" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 192
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityPerCamera" 144
+Vector 80 [_ProjectionParams]
+ConstBuffer "UnityLighting" 720
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerCamera" 1
+BindCB  "UnityLighting" 2
+BindCB  "UnityPerDraw" 3
+"vs_4_0
+root12:aaaeaaaa
+eefiecedakhmbagkmhioajbpackekgbdokfnddpaabaaaaaaomahaaaaadaaaaaa
+cmaaaaaaceabaaaanmabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+apaaaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaakeaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaakeaaaaaaadaaaaaaaaaaaaaa
+adaaaaaaaeaaaaaaahaiaaaakeaaaaaaaeaaaaaaaaaaaaaaadaaaaaaafaaaaaa
+apaaaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklklfdeieefc
+aiagaaaaeaaaabaaicabaaaafjaaaaaeegiocaaaaaaaaaaaamaaaaaafjaaaaae
+egiocaaaabaaaaaaagaaaaaafjaaaaaeegiocaaaacaaaaaacnaaaaaafjaaaaae
+egiocaaaadaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaa
+acaaaaaafpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaa
+gfaaaaadpccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadhccabaaa
+adaaaaaagfaaaaadhccabaaaaeaaaaaagfaaaaadpccabaaaafaaaaaagiaaaaac
+afaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaadaaaaaa
+abaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaaaaaaaaaaagbabaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaa
+acaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaa
+egiocaaaadaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadgaaaaaf
+pccabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaa
+adaaaaaaegiacaaaaaaaaaaaakaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaal
+mccabaaaabaaaaaaagbebaaaadaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaa
+aaaaaaaaalaaaaaadiaaaaaibcaabaaaabaaaaaaakbabaaaacaaaaaaakiacaaa
+adaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaaakbabaaaacaaaaaaakiacaaa
+adaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaaakbabaaaacaaaaaaakiacaaa
+adaaaaaabcaaaaaadiaaaaaibcaabaaaacaaaaaabkbabaaaacaaaaaabkiacaaa
+adaaaaaabaaaaaaadiaaaaaiccaabaaaacaaaaaabkbabaaaacaaaaaabkiacaaa
+adaaaaaabbaaaaaadiaaaaaiecaabaaaacaaaaaabkbabaaaacaaaaaabkiacaaa
+adaaaaaabcaaaaaaaaaaaaahhcaabaaaabaaaaaaegacbaaaabaaaaaaegacbaaa
+acaaaaaadiaaaaaibcaabaaaacaaaaaackbabaaaacaaaaaackiacaaaadaaaaaa
+baaaaaaadiaaaaaiccaabaaaacaaaaaackbabaaaacaaaaaackiacaaaadaaaaaa
+bbaaaaaadiaaaaaiecaabaaaacaaaaaackbabaaaacaaaaaackiacaaaadaaaaaa
+bcaaaaaaaaaaaaahhcaabaaaabaaaaaaegacbaaaabaaaaaaegacbaaaacaaaaaa
+baaaaaahicaabaaaabaaaaaaegacbaaaabaaaaaaegacbaaaabaaaaaaeeaaaaaf
+icaabaaaabaaaaaadkaabaaaabaaaaaadiaaaaahhcaabaaaabaaaaaapgapbaaa
+abaaaaaaegacbaaaabaaaaaadgaaaaafhccabaaaacaaaaaaegacbaaaabaaaaaa
+diaaaaaihcaabaaaacaaaaaafgbfbaaaaaaaaaaaegiccaaaadaaaaaaanaaaaaa
+dcaaaaakhcaabaaaacaaaaaaegiccaaaadaaaaaaamaaaaaaagbabaaaaaaaaaaa
+egacbaaaacaaaaaadcaaaaakhcaabaaaacaaaaaaegiccaaaadaaaaaaaoaaaaaa
+kgbkbaaaaaaaaaaaegacbaaaacaaaaaadcaaaaakhccabaaaadaaaaaaegiccaaa
+adaaaaaaapaaaaaapgbpbaaaaaaaaaaaegacbaaaacaaaaaadiaaaaahbcaabaaa
+acaaaaaabkaabaaaabaaaaaabkaabaaaabaaaaaadcaaaaakbcaabaaaacaaaaaa
+akaabaaaabaaaaaaakaabaaaabaaaaaaakaabaiaebaaaaaaacaaaaaadiaaaaah
+pcaabaaaadaaaaaajgacbaaaabaaaaaaegakbaaaabaaaaaabbaaaaaibcaabaaa
+aeaaaaaaegiocaaaacaaaaaacjaaaaaaegaobaaaadaaaaaabbaaaaaiccaabaaa
+aeaaaaaaegiocaaaacaaaaaackaaaaaaegaobaaaadaaaaaabbaaaaaiecaabaaa
+aeaaaaaaegiocaaaacaaaaaaclaaaaaaegaobaaaadaaaaaadcaaaaakhcaabaaa
+acaaaaaaegiccaaaacaaaaaacmaaaaaaagaabaaaacaaaaaaegacbaaaaeaaaaaa
+dgaaaaaficaabaaaabaaaaaaabeaaaaaaaaaiadpbbaaaaaibcaabaaaadaaaaaa
+egiocaaaacaaaaaacgaaaaaaegaobaaaabaaaaaabbaaaaaiccaabaaaadaaaaaa
+egiocaaaacaaaaaachaaaaaaegaobaaaabaaaaaabbaaaaaiecaabaaaadaaaaaa
+egiocaaaacaaaaaaciaaaaaaegaobaaaabaaaaaaaaaaaaahhccabaaaaeaaaaaa
+egacbaaaacaaaaaaegacbaaaadaaaaaadiaaaaaiccaabaaaaaaaaaaabkaabaaa
+aaaaaaaaakiacaaaabaaaaaaafaaaaaadiaaaaakncaabaaaabaaaaaaagahbaaa
+aaaaaaaaaceaaaaaaaaaaadpaaaaaaaaaaaaaadpaaaaaadpdgaaaaafmccabaaa
+afaaaaaakgaobaaaaaaaaaaaaaaaaaahdccabaaaafaaaaaakgakbaaaabaaaaaa
+mgaabaaaabaaaaaadoaaaaab"
+}
+SubProgram "d3d9 " {
+// Stats: 56 math
+Keywords { "DIRECTIONAL" "SHADOWS_OFF" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "VERTEXLIGHT_ON" }
+Bind "vertex" Vertex
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+Matrix 8 [_Object2World] 3
+Matrix 11 [_World2Object] 3
+Matrix 4 [glstate_matrix_mvp]
+Vector 26 [_Illum_ST]
+Vector 25 [_MainTex_ST]
+Vector 17 [unity_4LightAtten0]
+Vector 14 [unity_4LightPosX0]
+Vector 15 [unity_4LightPosY0]
+Vector 16 [unity_4LightPosZ0]
+Vector 0 [unity_LightColor0]
+Vector 1 [unity_LightColor1]
+Vector 2 [unity_LightColor2]
+Vector 3 [unity_LightColor3]
+Vector 20 [unity_SHAb]
+Vector 19 [unity_SHAg]
+Vector 18 [unity_SHAr]
+Vector 23 [unity_SHBb]
+Vector 22 [unity_SHBg]
+Vector 21 [unity_SHBr]
+Vector 24 [unity_SHC]
+"vs_2_0
+def c27, 1, 0, 0, 0
+dcl_position v0
+dcl_normal v1
+dcl_texcoord v2
+dp4 oPos.x, c4, v0
+dp4 oPos.y, c5, v0
+dp4 oPos.z, c6, v0
+dp4 oPos.w, c7, v0
+mad oT0.xy, v2, c25, c25.zwzw
+mad oT0.zw, v2.xyxy, c26.xyxy, c26
+mul r0.xyz, v1.y, c12
+mad r0.xyz, c11, v1.x, r0
+mad r0.xyz, c13, v1.z, r0
+nrm r1.xyz, r0
+mul r0.x, r1.y, r1.y
+mad r0.x, r1.x, r1.x, -r0.x
+mul r2, r1.yzzx, r1.xyzz
+dp4 r3.x, c21, r2
+dp4 r3.y, c22, r2
+dp4 r3.z, c23, r2
+mad r0.xyz, c24, r0.x, r3
+mov r1.w, c27.x
+dp4 r2.x, c18, r1
+dp4 r2.y, c19, r1
+dp4 r2.z, c20, r1
+add r0.xyz, r0, r2
+dp4 r2.y, c9, v0
+add r3, -r2.y, c15
+mul r4, r1.y, r3
+mul r3, r3, r3
+dp4 r2.x, c8, v0
+add r5, -r2.x, c14
+mad r4, r5, r1.x, r4
+mad r3, r5, r5, r3
+dp4 r2.z, c10, v0
+add r5, -r2.z, c16
+mov oT2.xyz, r2
+mad r2, r5, r1.z, r4
+mov oT1.xyz, r1
+mad r1, r5, r5, r3
+rsq r3.x, r1.x
+rsq r3.y, r1.y
+rsq r3.z, r1.z
+rsq r3.w, r1.w
+mov r4.x, c27.x
+mad r1, r1, c17, r4.x
+mul r2, r2, r3
+max r2, r2, c27.y
+rcp r3.x, r1.x
+rcp r3.y, r1.y
+rcp r3.z, r1.z
+rcp r3.w, r1.w
+mul r1, r2, r3
+mul r2.xyz, r1.y, c1
+mad r2.xyz, c0, r1.x, r2
+mad r1.xyz, c2, r1.z, r2
+mad r1.xyz, c3, r1.w, r1
+add oT3.xyz, r0, r1
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 55 math
+Keywords { "DIRECTIONAL" "SHADOWS_OFF" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "VERTEXLIGHT_ON" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 192
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityLighting" 720
+Vector 32 [unity_4LightPosX0]
+Vector 48 [unity_4LightPosY0]
+Vector 64 [unity_4LightPosZ0]
+Vector 80 [unity_4LightAtten0]
+Vector 96 [unity_LightColor0]
+Vector 112 [unity_LightColor1]
+Vector 128 [unity_LightColor2]
+Vector 144 [unity_LightColor3]
+Vector 160 [unity_LightColor4]
+Vector 176 [unity_LightColor5]
+Vector 192 [unity_LightColor6]
+Vector 208 [unity_LightColor7]
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+BindCB  "UnityPerDraw" 2
+"vs_4_0
+root12:aaadaaaa
+eefiecedlanllnmkkeihfabjckiookonoechpimlabaaaaaapiajaaaaadaaaaaa
+cmaaaaaaceabaaaameabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheojiaaaaaaafaaaaaaaiaaaaaaiaaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaaimaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+apaaaaaaimaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaaimaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaaimaaaaaaadaaaaaaaaaaaaaa
+adaaaaaaaeaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfcee
+aaklklklfdeieefccmaiaaaaeaaaabaaalacaaaafjaaaaaeegiocaaaaaaaaaaa
+amaaaaaafjaaaaaeegiocaaaabaaaaaacnaaaaaafjaaaaaeegiocaaaacaaaaaa
+bdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaafpaaaaad
+dcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaadpccabaaa
+abaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaagfaaaaad
+hccabaaaaeaaaaaagiaaaaacagaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaa
+aaaaaaaaegiocaaaacaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaa
+acaaaaaaaaaaaaaaagbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaa
+aaaaaaaaegiocaaaacaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaa
+dcaaaaakpccabaaaaaaaaaaaegiocaaaacaaaaaaadaaaaaapgbpbaaaaaaaaaaa
+egaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaaegiacaaa
+aaaaaaaaakaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaalmccabaaaabaaaaaa
+agbebaaaadaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaaaaaaaaaaalaaaaaa
+diaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaabaaaaaaa
+diaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaabbaaaaaa
+diaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaabcaaaaaa
+diaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaabaaaaaaa
+diaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaabbaaaaaa
+diaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaabcaaaaaa
+aaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaai
+bcaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabaaaaaaadiaaaaai
+ccaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabbaaaaaadiaaaaai
+ecaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabcaaaaaaaaaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaa
+dkaabaaaaaaaaaaadiaaaaahhcaabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaa
+aaaaaaaadgaaaaafhccabaaaacaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaa
+abaaaaaafgbfbaaaaaaaaaaaegiccaaaacaaaaaaanaaaaaadcaaaaakhcaabaaa
+abaaaaaaegiccaaaacaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaaabaaaaaa
+dcaaaaakhcaabaaaabaaaaaaegiccaaaacaaaaaaaoaaaaaakgbkbaaaaaaaaaaa
+egacbaaaabaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaacaaaaaaapaaaaaa
+pgbpbaaaaaaaaaaaegacbaaaabaaaaaadgaaaaafhccabaaaadaaaaaaegacbaaa
+abaaaaaadiaaaaahicaabaaaabaaaaaabkaabaaaaaaaaaaabkaabaaaaaaaaaaa
+dcaaaaakicaabaaaabaaaaaaakaabaaaaaaaaaaaakaabaaaaaaaaaaadkaabaia
+ebaaaaaaabaaaaaadiaaaaahpcaabaaaacaaaaaajgacbaaaaaaaaaaaegakbaaa
+aaaaaaaabbaaaaaibcaabaaaadaaaaaaegiocaaaabaaaaaacjaaaaaaegaobaaa
+acaaaaaabbaaaaaiccaabaaaadaaaaaaegiocaaaabaaaaaackaaaaaaegaobaaa
+acaaaaaabbaaaaaiecaabaaaadaaaaaaegiocaaaabaaaaaaclaaaaaaegaobaaa
+acaaaaaadcaaaaakhcaabaaaacaaaaaaegiccaaaabaaaaaacmaaaaaapgapbaaa
+abaaaaaaegacbaaaadaaaaaadgaaaaaficaabaaaaaaaaaaaabeaaaaaaaaaiadp
+bbaaaaaibcaabaaaadaaaaaaegiocaaaabaaaaaacgaaaaaaegaobaaaaaaaaaaa
+bbaaaaaiccaabaaaadaaaaaaegiocaaaabaaaaaachaaaaaaegaobaaaaaaaaaaa
+bbaaaaaiecaabaaaadaaaaaaegiocaaaabaaaaaaciaaaaaaegaobaaaaaaaaaaa
+aaaaaaahhcaabaaaacaaaaaaegacbaaaacaaaaaaegacbaaaadaaaaaaaaaaaaaj
+pcaabaaaadaaaaaafgafbaiaebaaaaaaabaaaaaaegiocaaaabaaaaaaadaaaaaa
+diaaaaahpcaabaaaaeaaaaaafgafbaaaaaaaaaaaegaobaaaadaaaaaadiaaaaah
+pcaabaaaadaaaaaaegaobaaaadaaaaaaegaobaaaadaaaaaaaaaaaaajpcaabaaa
+afaaaaaaagaabaiaebaaaaaaabaaaaaaegiocaaaabaaaaaaacaaaaaaaaaaaaaj
+pcaabaaaabaaaaaakgakbaiaebaaaaaaabaaaaaaegiocaaaabaaaaaaaeaaaaaa
+dcaaaaajpcaabaaaaeaaaaaaegaobaaaafaaaaaaagaabaaaaaaaaaaaegaobaaa
+aeaaaaaadcaaaaajpcaabaaaaaaaaaaaegaobaaaabaaaaaakgakbaaaaaaaaaaa
+egaobaaaaeaaaaaadcaaaaajpcaabaaaadaaaaaaegaobaaaafaaaaaaegaobaaa
+afaaaaaaegaobaaaadaaaaaadcaaaaajpcaabaaaabaaaaaaegaobaaaabaaaaaa
+egaobaaaabaaaaaaegaobaaaadaaaaaaeeaaaaafpcaabaaaadaaaaaaegaobaaa
+abaaaaaadcaaaaanpcaabaaaabaaaaaaegaobaaaabaaaaaaegiocaaaabaaaaaa
+afaaaaaaaceaaaaaaaaaiadpaaaaiadpaaaaiadpaaaaiadpaoaaaaakpcaabaaa
+abaaaaaaaceaaaaaaaaaiadpaaaaiadpaaaaiadpaaaaiadpegaobaaaabaaaaaa
+diaaaaahpcaabaaaaaaaaaaaegaobaaaaaaaaaaaegaobaaaadaaaaaadeaaaaak
+pcaabaaaaaaaaaaaegaobaaaaaaaaaaaaceaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaadiaaaaahpcaabaaaaaaaaaaaegaobaaaabaaaaaaegaobaaaaaaaaaaa
+diaaaaaihcaabaaaabaaaaaafgafbaaaaaaaaaaaegiccaaaabaaaaaaahaaaaaa
+dcaaaaakhcaabaaaabaaaaaaegiccaaaabaaaaaaagaaaaaaagaabaaaaaaaaaaa
+egacbaaaabaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaabaaaaaaaiaaaaaa
+kgakbaaaaaaaaaaaegacbaaaabaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaa
+abaaaaaaajaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaaaaaaaaahhccabaaa
+aeaaaaaaegacbaaaaaaaaaaaegacbaaaacaaaaaadoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 55 math
+Keywords { "DIRECTIONAL" "SHADOWS_OFF" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "VERTEXLIGHT_ON" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 192
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityLighting" 720
+Vector 32 [unity_4LightPosX0]
+Vector 48 [unity_4LightPosY0]
+Vector 64 [unity_4LightPosZ0]
+Vector 80 [unity_4LightAtten0]
+Vector 96 [unity_LightColor0]
+Vector 112 [unity_LightColor1]
+Vector 128 [unity_LightColor2]
+Vector 144 [unity_LightColor3]
+Vector 160 [unity_LightColor4]
+Vector 176 [unity_LightColor5]
+Vector 192 [unity_LightColor6]
+Vector 208 [unity_LightColor7]
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+BindCB  "UnityPerDraw" 2
+"vs_4_0_level_9_1
+root12:aaadaaaa
+eefiecedodlcjponbholjmjabnhfaolbhbamnkkiabaaaaaanaaoaaaaaeaaaaaa
+daaaaaaaaeafaaaadianaaaadaaoaaaaebgpgodjmmaeaaaammaeaaaaaaacpopp
+giaeaaaageaaaaaaafaaceaaaaaagaaaaaaagaaaaaaaceaaabaagaaaaaaaakaa
+acaaabaaaaaaaaaaabaaacaaaiaaadaaaaaaaaaaabaacgaaahaaalaaaaaaaaaa
+acaaaaaaaeaabcaaaaaaaaaaacaaamaaahaabgaaaaaaaaaaaaaaaaaaaaacpopp
+fbaaaaafbnaaapkaaaaaiadpaaaaaaaaaaaaaaaaaaaaaaaabpaaaaacafaaaaia
+aaaaapjabpaaaaacafaaaciaacaaapjabpaaaaacafaaadiaadaaapjaaeaaaaae
+aaaaadoaadaaoejaabaaoekaabaaookaaeaaaaaeaaaaamoaadaaeejaacaaeeka
+acaaoekaafaaaaadaaaaabiaacaaaajabkaaaakaafaaaaadaaaaaciaacaaaaja
+blaaaakaafaaaaadaaaaaeiaacaaaajabmaaaakaafaaaaadabaaabiaacaaffja
+bkaaffkaafaaaaadabaaaciaacaaffjablaaffkaafaaaaadabaaaeiaacaaffja
+bmaaffkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaafaaaaadabaaabiaacaakkja
+bkaakkkaafaaaaadabaaaciaacaakkjablaakkkaafaaaaadabaaaeiaacaakkja
+bmaakkkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaceaaaaacabaaahiaaaaaoeia
+afaaaaadaaaaabiaabaaffiaabaaffiaaeaaaaaeaaaaabiaabaaaaiaabaaaaia
+aaaaaaibafaaaaadacaaapiaabaacjiaabaakeiaajaaaaadadaaabiaaoaaoeka
+acaaoeiaajaaaaadadaaaciaapaaoekaacaaoeiaajaaaaadadaaaeiabaaaoeka
+acaaoeiaaeaaaaaeaaaaahiabbaaoekaaaaaaaiaadaaoeiaabaaaaacabaaaiia
+bnaaaakaajaaaaadacaaabiaalaaoekaabaaoeiaajaaaaadacaaaciaamaaoeka
+abaaoeiaajaaaaadacaaaeiaanaaoekaabaaoeiaacaaaaadaaaaahiaaaaaoeia
+acaaoeiaafaaaaadacaaahiaaaaaffjabhaaoekaaeaaaaaeacaaahiabgaaoeka
+aaaaaajaacaaoeiaaeaaaaaeacaaahiabiaaoekaaaaakkjaacaaoeiaaeaaaaae
+acaaahiabjaaoekaaaaappjaacaaoeiaacaaaaadadaaapiaacaaffibaeaaoeka
+afaaaaadaeaaapiaabaaffiaadaaoeiaafaaaaadadaaapiaadaaoeiaadaaoeia
+acaaaaadafaaapiaacaaaaibadaaoekaaeaaaaaeaeaaapiaafaaoeiaabaaaaia
+aeaaoeiaaeaaaaaeadaaapiaafaaoeiaafaaoeiaadaaoeiaacaaaaadafaaapia
+acaakkibafaaoekaabaaaaacacaaahoaacaaoeiaaeaaaaaeacaaapiaafaaoeia
+abaakkiaaeaaoeiaabaaaaacabaaahoaabaaoeiaaeaaaaaeabaaapiaafaaoeia
+afaaoeiaadaaoeiaahaaaaacadaaabiaabaaaaiaahaaaaacadaaaciaabaaffia
+ahaaaaacadaaaeiaabaakkiaahaaaaacadaaaiiaabaappiaabaaaaacaeaaabia
+bnaaaakaaeaaaaaeabaaapiaabaaoeiaagaaoekaaeaaaaiaafaaaaadacaaapia
+acaaoeiaadaaoeiaalaaaaadacaaapiaacaaoeiabnaaffkaagaaaaacadaaabia
+abaaaaiaagaaaaacadaaaciaabaaffiaagaaaaacadaaaeiaabaakkiaagaaaaac
+adaaaiiaabaappiaafaaaaadabaaapiaacaaoeiaadaaoeiaafaaaaadacaaahia
+abaaffiaaiaaoekaaeaaaaaeacaaahiaahaaoekaabaaaaiaacaaoeiaaeaaaaae
+abaaahiaajaaoekaabaakkiaacaaoeiaaeaaaaaeabaaahiaakaaoekaabaappia
+abaaoeiaacaaaaadadaaahoaaaaaoeiaabaaoeiaafaaaaadaaaaapiaaaaaffja
+bdaaoekaaeaaaaaeaaaaapiabcaaoekaaaaaaajaaaaaoeiaaeaaaaaeaaaaapia
+beaaoekaaaaakkjaaaaaoeiaaeaaaaaeaaaaapiabfaaoekaaaaappjaaaaaoeia
+aeaaaaaeaaaaadmaaaaappiaaaaaoekaaaaaoeiaabaaaaacaaaaammaaaaaoeia
+ppppaaaafdeieefccmaiaaaaeaaaabaaalacaaaafjaaaaaeegiocaaaaaaaaaaa
+amaaaaaafjaaaaaeegiocaaaabaaaaaacnaaaaaafjaaaaaeegiocaaaacaaaaaa
+bdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaafpaaaaad
+dcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaadpccabaaa
+abaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaagfaaaaad
+hccabaaaaeaaaaaagiaaaaacagaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaa
+aaaaaaaaegiocaaaacaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaa
+acaaaaaaaaaaaaaaagbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaa
+aaaaaaaaegiocaaaacaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaa
+dcaaaaakpccabaaaaaaaaaaaegiocaaaacaaaaaaadaaaaaapgbpbaaaaaaaaaaa
+egaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaaegiacaaa
+aaaaaaaaakaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaalmccabaaaabaaaaaa
+agbebaaaadaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaaaaaaaaaaalaaaaaa
+diaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaabaaaaaaa
+diaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaabbaaaaaa
+diaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaabcaaaaaa
+diaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaabaaaaaaa
+diaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaabbaaaaaa
+diaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaabcaaaaaa
+aaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaai
+bcaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabaaaaaaadiaaaaai
+ccaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabbaaaaaadiaaaaai
+ecaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabcaaaaaaaaaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaa
+dkaabaaaaaaaaaaadiaaaaahhcaabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaa
+aaaaaaaadgaaaaafhccabaaaacaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaa
+abaaaaaafgbfbaaaaaaaaaaaegiccaaaacaaaaaaanaaaaaadcaaaaakhcaabaaa
+abaaaaaaegiccaaaacaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaaabaaaaaa
+dcaaaaakhcaabaaaabaaaaaaegiccaaaacaaaaaaaoaaaaaakgbkbaaaaaaaaaaa
+egacbaaaabaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaacaaaaaaapaaaaaa
+pgbpbaaaaaaaaaaaegacbaaaabaaaaaadgaaaaafhccabaaaadaaaaaaegacbaaa
+abaaaaaadiaaaaahicaabaaaabaaaaaabkaabaaaaaaaaaaabkaabaaaaaaaaaaa
+dcaaaaakicaabaaaabaaaaaaakaabaaaaaaaaaaaakaabaaaaaaaaaaadkaabaia
+ebaaaaaaabaaaaaadiaaaaahpcaabaaaacaaaaaajgacbaaaaaaaaaaaegakbaaa
+aaaaaaaabbaaaaaibcaabaaaadaaaaaaegiocaaaabaaaaaacjaaaaaaegaobaaa
+acaaaaaabbaaaaaiccaabaaaadaaaaaaegiocaaaabaaaaaackaaaaaaegaobaaa
+acaaaaaabbaaaaaiecaabaaaadaaaaaaegiocaaaabaaaaaaclaaaaaaegaobaaa
+acaaaaaadcaaaaakhcaabaaaacaaaaaaegiccaaaabaaaaaacmaaaaaapgapbaaa
+abaaaaaaegacbaaaadaaaaaadgaaaaaficaabaaaaaaaaaaaabeaaaaaaaaaiadp
+bbaaaaaibcaabaaaadaaaaaaegiocaaaabaaaaaacgaaaaaaegaobaaaaaaaaaaa
+bbaaaaaiccaabaaaadaaaaaaegiocaaaabaaaaaachaaaaaaegaobaaaaaaaaaaa
+bbaaaaaiecaabaaaadaaaaaaegiocaaaabaaaaaaciaaaaaaegaobaaaaaaaaaaa
+aaaaaaahhcaabaaaacaaaaaaegacbaaaacaaaaaaegacbaaaadaaaaaaaaaaaaaj
+pcaabaaaadaaaaaafgafbaiaebaaaaaaabaaaaaaegiocaaaabaaaaaaadaaaaaa
+diaaaaahpcaabaaaaeaaaaaafgafbaaaaaaaaaaaegaobaaaadaaaaaadiaaaaah
+pcaabaaaadaaaaaaegaobaaaadaaaaaaegaobaaaadaaaaaaaaaaaaajpcaabaaa
+afaaaaaaagaabaiaebaaaaaaabaaaaaaegiocaaaabaaaaaaacaaaaaaaaaaaaaj
+pcaabaaaabaaaaaakgakbaiaebaaaaaaabaaaaaaegiocaaaabaaaaaaaeaaaaaa
+dcaaaaajpcaabaaaaeaaaaaaegaobaaaafaaaaaaagaabaaaaaaaaaaaegaobaaa
+aeaaaaaadcaaaaajpcaabaaaaaaaaaaaegaobaaaabaaaaaakgakbaaaaaaaaaaa
+egaobaaaaeaaaaaadcaaaaajpcaabaaaadaaaaaaegaobaaaafaaaaaaegaobaaa
+afaaaaaaegaobaaaadaaaaaadcaaaaajpcaabaaaabaaaaaaegaobaaaabaaaaaa
+egaobaaaabaaaaaaegaobaaaadaaaaaaeeaaaaafpcaabaaaadaaaaaaegaobaaa
+abaaaaaadcaaaaanpcaabaaaabaaaaaaegaobaaaabaaaaaaegiocaaaabaaaaaa
+afaaaaaaaceaaaaaaaaaiadpaaaaiadpaaaaiadpaaaaiadpaoaaaaakpcaabaaa
+abaaaaaaaceaaaaaaaaaiadpaaaaiadpaaaaiadpaaaaiadpegaobaaaabaaaaaa
+diaaaaahpcaabaaaaaaaaaaaegaobaaaaaaaaaaaegaobaaaadaaaaaadeaaaaak
+pcaabaaaaaaaaaaaegaobaaaaaaaaaaaaceaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaadiaaaaahpcaabaaaaaaaaaaaegaobaaaabaaaaaaegaobaaaaaaaaaaa
+diaaaaaihcaabaaaabaaaaaafgafbaaaaaaaaaaaegiccaaaabaaaaaaahaaaaaa
+dcaaaaakhcaabaaaabaaaaaaegiccaaaabaaaaaaagaaaaaaagaabaaaaaaaaaaa
+egacbaaaabaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaabaaaaaaaiaaaaaa
+kgakbaaaaaaaaaaaegacbaaaabaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaa
+abaaaaaaajaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaaaaaaaaahhccabaaa
+aeaaaaaaegacbaaaaaaaaaaaegacbaaaacaaaaaadoaaaaabejfdeheopaaaaaaa
+aiaaaaaaaiaaaaaamiaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaa
+nbaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaa
+aaaaaaaaadaaaaaaacaaaaaaahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaa
+adaaaaaaapadaaaaoaaaaaaaabaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaa
+oaaaaaaaacaaaaaaaaaaaaaaadaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaa
+aaaaaaaaadaaaaaaagaaaaaaapaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaa
+ahaaaaaaapaaaaaafaepfdejfeejepeoaafeebeoehefeofeaaeoepfcenebemaa
+feeffiedepepfceeaaedepemepfcaaklepfdeheojiaaaaaaafaaaaaaaiaaaaaa
+iaaaaaaaaaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaaimaaaaaaaaaaaaaa
+aaaaaaaaadaaaaaaabaaaaaaapaaaaaaimaaaaaaabaaaaaaaaaaaaaaadaaaaaa
+acaaaaaaahaiaaaaimaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaa
+imaaaaaaadaaaaaaaaaaaaaaadaaaaaaaeaaaaaaahaiaaaafdfgfpfaepfdejfe
+ejepeoaafeeffiedepepfceeaaklklkl"
+}
+SubProgram "d3d9 " {
+// Stats: 62 math
+Keywords { "DIRECTIONAL" "SHADOWS_SCREEN" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "VERTEXLIGHT_ON" }
+Bind "vertex" Vertex
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+Matrix 8 [_Object2World] 3
+Matrix 11 [_World2Object] 3
+Matrix 4 [glstate_matrix_mvp]
+Vector 28 [_Illum_ST]
+Vector 27 [_MainTex_ST]
+Vector 14 [_ProjectionParams]
+Vector 15 [_ScreenParams]
+Vector 19 [unity_4LightAtten0]
+Vector 16 [unity_4LightPosX0]
+Vector 17 [unity_4LightPosY0]
+Vector 18 [unity_4LightPosZ0]
+Vector 0 [unity_LightColor0]
+Vector 1 [unity_LightColor1]
+Vector 2 [unity_LightColor2]
+Vector 3 [unity_LightColor3]
+Vector 22 [unity_SHAb]
+Vector 21 [unity_SHAg]
+Vector 20 [unity_SHAr]
+Vector 25 [unity_SHBb]
+Vector 24 [unity_SHBg]
+Vector 23 [unity_SHBr]
+Vector 26 [unity_SHC]
+"vs_2_0
+def c29, 1, 0, 0.5, 0
+dcl_position v0
+dcl_normal v1
+dcl_texcoord v2
+mad oT0.xy, v2, c27, c27.zwzw
+mad oT0.zw, v2.xyxy, c28.xyxy, c28
+mul r0.xyz, v1.y, c12
+mad r0.xyz, c11, v1.x, r0
+mad r0.xyz, c13, v1.z, r0
+nrm r1.xyz, r0
+mul r0.x, r1.y, r1.y
+mad r0.x, r1.x, r1.x, -r0.x
+mul r2, r1.yzzx, r1.xyzz
+dp4 r3.x, c23, r2
+dp4 r3.y, c24, r2
+dp4 r3.z, c25, r2
+mad r0.xyz, c26, r0.x, r3
+mov r1.w, c29.x
+dp4 r2.x, c20, r1
+dp4 r2.y, c21, r1
+dp4 r2.z, c22, r1
+add r0.xyz, r0, r2
+dp4 r2.y, c9, v0
+add r3, -r2.y, c17
+mul r4, r1.y, r3
+mul r3, r3, r3
+dp4 r2.x, c8, v0
+add r5, -r2.x, c16
+mad r4, r5, r1.x, r4
+mad r3, r5, r5, r3
+dp4 r2.z, c10, v0
+add r5, -r2.z, c18
+mov oT2.xyz, r2
+mad r2, r5, r1.z, r4
+mov oT1.xyz, r1
+mad r1, r5, r5, r3
+rsq r3.x, r1.x
+rsq r3.y, r1.y
+rsq r3.z, r1.z
+rsq r3.w, r1.w
+mov r4.x, c29.x
+mad r1, r1, c19, r4.x
+mul r2, r2, r3
+max r2, r2, c29.y
+rcp r3.x, r1.x
+rcp r3.y, r1.y
+rcp r3.z, r1.z
+rcp r3.w, r1.w
+mul r1, r2, r3
+mul r2.xyz, r1.y, c1
+mad r2.xyz, c0, r1.x, r2
+mad r1.xyz, c2, r1.z, r2
+mad r1.xyz, c3, r1.w, r1
+add oT3.xyz, r0, r1
+dp4 r0.y, c5, v0
+mul r1.x, r0.y, c14.x
+mul r1.w, r1.x, c29.z
+dp4 r0.x, c4, v0
+dp4 r0.w, c7, v0
+mul r1.xz, r0.xyww, c29.z
+mad oT4.xy, r1.z, c15.zwzw, r1.xwzw
+dp4 r0.z, c6, v0
+mov oPos, r0
+mov oT4.zw, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 58 math
+Keywords { "DIRECTIONAL" "SHADOWS_SCREEN" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "VERTEXLIGHT_ON" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 192
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityPerCamera" 144
+Vector 80 [_ProjectionParams]
+ConstBuffer "UnityLighting" 720
+Vector 32 [unity_4LightPosX0]
+Vector 48 [unity_4LightPosY0]
+Vector 64 [unity_4LightPosZ0]
+Vector 80 [unity_4LightAtten0]
+Vector 96 [unity_LightColor0]
+Vector 112 [unity_LightColor1]
+Vector 128 [unity_LightColor2]
+Vector 144 [unity_LightColor3]
+Vector 160 [unity_LightColor4]
+Vector 176 [unity_LightColor5]
+Vector 192 [unity_LightColor6]
+Vector 208 [unity_LightColor7]
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerCamera" 1
+BindCB  "UnityLighting" 2
+BindCB  "UnityPerDraw" 3
+"vs_4_0
+root12:aaaeaaaa
+eefiecedhgkmndkjdaflhnbhciobloakkaghglnmabaaaaaaliakaaaaadaaaaaa
+cmaaaaaaceabaaaanmabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+apaaaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaakeaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaakeaaaaaaadaaaaaaaaaaaaaa
+adaaaaaaaeaaaaaaahaiaaaakeaaaaaaaeaaaaaaaaaaaaaaadaaaaaaafaaaaaa
+apaaaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklklfdeieefc
+neaiaaaaeaaaabaadfacaaaafjaaaaaeegiocaaaaaaaaaaaamaaaaaafjaaaaae
+egiocaaaabaaaaaaagaaaaaafjaaaaaeegiocaaaacaaaaaacnaaaaaafjaaaaae
+egiocaaaadaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaa
+acaaaaaafpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaa
+gfaaaaadpccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadhccabaaa
+adaaaaaagfaaaaadhccabaaaaeaaaaaagfaaaaadpccabaaaafaaaaaagiaaaaac
+ahaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaadaaaaaa
+abaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaaaaaaaaaaagbabaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaa
+acaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaa
+egiocaaaadaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadgaaaaaf
+pccabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaa
+adaaaaaaegiacaaaaaaaaaaaakaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaal
+mccabaaaabaaaaaaagbebaaaadaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaa
+aaaaaaaaalaaaaaadiaaaaaibcaabaaaabaaaaaaakbabaaaacaaaaaaakiacaaa
+adaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaaakbabaaaacaaaaaaakiacaaa
+adaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaaakbabaaaacaaaaaaakiacaaa
+adaaaaaabcaaaaaadiaaaaaibcaabaaaacaaaaaabkbabaaaacaaaaaabkiacaaa
+adaaaaaabaaaaaaadiaaaaaiccaabaaaacaaaaaabkbabaaaacaaaaaabkiacaaa
+adaaaaaabbaaaaaadiaaaaaiecaabaaaacaaaaaabkbabaaaacaaaaaabkiacaaa
+adaaaaaabcaaaaaaaaaaaaahhcaabaaaabaaaaaaegacbaaaabaaaaaaegacbaaa
+acaaaaaadiaaaaaibcaabaaaacaaaaaackbabaaaacaaaaaackiacaaaadaaaaaa
+baaaaaaadiaaaaaiccaabaaaacaaaaaackbabaaaacaaaaaackiacaaaadaaaaaa
+bbaaaaaadiaaaaaiecaabaaaacaaaaaackbabaaaacaaaaaackiacaaaadaaaaaa
+bcaaaaaaaaaaaaahhcaabaaaabaaaaaaegacbaaaabaaaaaaegacbaaaacaaaaaa
+baaaaaahicaabaaaabaaaaaaegacbaaaabaaaaaaegacbaaaabaaaaaaeeaaaaaf
+icaabaaaabaaaaaadkaabaaaabaaaaaadiaaaaahhcaabaaaabaaaaaapgapbaaa
+abaaaaaaegacbaaaabaaaaaadgaaaaafhccabaaaacaaaaaaegacbaaaabaaaaaa
+diaaaaaihcaabaaaacaaaaaafgbfbaaaaaaaaaaaegiccaaaadaaaaaaanaaaaaa
+dcaaaaakhcaabaaaacaaaaaaegiccaaaadaaaaaaamaaaaaaagbabaaaaaaaaaaa
+egacbaaaacaaaaaadcaaaaakhcaabaaaacaaaaaaegiccaaaadaaaaaaaoaaaaaa
+kgbkbaaaaaaaaaaaegacbaaaacaaaaaadcaaaaakhcaabaaaacaaaaaaegiccaaa
+adaaaaaaapaaaaaapgbpbaaaaaaaaaaaegacbaaaacaaaaaadgaaaaafhccabaaa
+adaaaaaaegacbaaaacaaaaaadiaaaaahicaabaaaacaaaaaabkaabaaaabaaaaaa
+bkaabaaaabaaaaaadcaaaaakicaabaaaacaaaaaaakaabaaaabaaaaaaakaabaaa
+abaaaaaadkaabaiaebaaaaaaacaaaaaadiaaaaahpcaabaaaadaaaaaajgacbaaa
+abaaaaaaegakbaaaabaaaaaabbaaaaaibcaabaaaaeaaaaaaegiocaaaacaaaaaa
+cjaaaaaaegaobaaaadaaaaaabbaaaaaiccaabaaaaeaaaaaaegiocaaaacaaaaaa
+ckaaaaaaegaobaaaadaaaaaabbaaaaaiecaabaaaaeaaaaaaegiocaaaacaaaaaa
+claaaaaaegaobaaaadaaaaaadcaaaaakhcaabaaaadaaaaaaegiccaaaacaaaaaa
+cmaaaaaapgapbaaaacaaaaaaegacbaaaaeaaaaaadgaaaaaficaabaaaabaaaaaa
+abeaaaaaaaaaiadpbbaaaaaibcaabaaaaeaaaaaaegiocaaaacaaaaaacgaaaaaa
+egaobaaaabaaaaaabbaaaaaiccaabaaaaeaaaaaaegiocaaaacaaaaaachaaaaaa
+egaobaaaabaaaaaabbaaaaaiecaabaaaaeaaaaaaegiocaaaacaaaaaaciaaaaaa
+egaobaaaabaaaaaaaaaaaaahhcaabaaaadaaaaaaegacbaaaadaaaaaaegacbaaa
+aeaaaaaaaaaaaaajpcaabaaaaeaaaaaafgafbaiaebaaaaaaacaaaaaaegiocaaa
+acaaaaaaadaaaaaadiaaaaahpcaabaaaafaaaaaafgafbaaaabaaaaaaegaobaaa
+aeaaaaaadiaaaaahpcaabaaaaeaaaaaaegaobaaaaeaaaaaaegaobaaaaeaaaaaa
+aaaaaaajpcaabaaaagaaaaaaagaabaiaebaaaaaaacaaaaaaegiocaaaacaaaaaa
+acaaaaaaaaaaaaajpcaabaaaacaaaaaakgakbaiaebaaaaaaacaaaaaaegiocaaa
+acaaaaaaaeaaaaaadcaaaaajpcaabaaaafaaaaaaegaobaaaagaaaaaaagaabaaa
+abaaaaaaegaobaaaafaaaaaadcaaaaajpcaabaaaabaaaaaaegaobaaaacaaaaaa
+kgakbaaaabaaaaaaegaobaaaafaaaaaadcaaaaajpcaabaaaaeaaaaaaegaobaaa
+agaaaaaaegaobaaaagaaaaaaegaobaaaaeaaaaaadcaaaaajpcaabaaaacaaaaaa
+egaobaaaacaaaaaaegaobaaaacaaaaaaegaobaaaaeaaaaaaeeaaaaafpcaabaaa
+aeaaaaaaegaobaaaacaaaaaadcaaaaanpcaabaaaacaaaaaaegaobaaaacaaaaaa
+egiocaaaacaaaaaaafaaaaaaaceaaaaaaaaaiadpaaaaiadpaaaaiadpaaaaiadp
+aoaaaaakpcaabaaaacaaaaaaaceaaaaaaaaaiadpaaaaiadpaaaaiadpaaaaiadp
+egaobaaaacaaaaaadiaaaaahpcaabaaaabaaaaaaegaobaaaabaaaaaaegaobaaa
+aeaaaaaadeaaaaakpcaabaaaabaaaaaaegaobaaaabaaaaaaaceaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaadiaaaaahpcaabaaaabaaaaaaegaobaaaacaaaaaa
+egaobaaaabaaaaaadiaaaaaihcaabaaaacaaaaaafgafbaaaabaaaaaaegiccaaa
+acaaaaaaahaaaaaadcaaaaakhcaabaaaacaaaaaaegiccaaaacaaaaaaagaaaaaa
+agaabaaaabaaaaaaegacbaaaacaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaa
+acaaaaaaaiaaaaaakgakbaaaabaaaaaaegacbaaaacaaaaaadcaaaaakhcaabaaa
+abaaaaaaegiccaaaacaaaaaaajaaaaaapgapbaaaabaaaaaaegacbaaaabaaaaaa
+aaaaaaahhccabaaaaeaaaaaaegacbaaaabaaaaaaegacbaaaadaaaaaadiaaaaai
+ccaabaaaaaaaaaaabkaabaaaaaaaaaaaakiacaaaabaaaaaaafaaaaaadiaaaaak
+ncaabaaaabaaaaaaagahbaaaaaaaaaaaaceaaaaaaaaaaadpaaaaaaaaaaaaaadp
+aaaaaadpdgaaaaafmccabaaaafaaaaaakgaobaaaaaaaaaaaaaaaaaahdccabaaa
+afaaaaaakgakbaaaabaaaaaamgaabaaaabaaaaaadoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 43 math
+Keywords { "DIRECTIONAL" "SHADOWS_SCREEN" "SHADOWS_NATIVE" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 192
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityLighting" 720
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityShadows" 416
+Matrix 128 [unity_World2Shadow0]
+Matrix 192 [unity_World2Shadow1]
+Matrix 256 [unity_World2Shadow2]
+Matrix 320 [unity_World2Shadow3]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+BindCB  "UnityShadows" 2
+BindCB  "UnityPerDraw" 3
+"vs_4_0_level_9_1
+root12:aaaeaaaa
+eefiecedbobonaapngcbghmllidpbcifljfpdggbabaaaaaaeiamaaaaaeaaaaaa
+daaaaaaaoeadaaaajiakaaaajaalaaaaebgpgodjkmadaaaakmadaaaaaaacpopp
+eiadaaaageaaaaaaafaaceaaaaaagaaaaaaagaaaaaaaceaaabaagaaaaaaaakaa
+acaaabaaaaaaaaaaabaacgaaahaaadaaaaaaaaaaacaaaiaaaeaaakaaaaaaaaaa
+adaaaaaaaeaaaoaaaaaaaaaaadaaamaaahaabcaaaaaaaaaaaaaaaaaaaaacpopp
+fbaaaaafbjaaapkaaaaaiadpaaaaaaaaaaaaaaaaaaaaaaaabpaaaaacafaaaaia
+aaaaapjabpaaaaacafaaaciaacaaapjabpaaaaacafaaadiaadaaapjaaeaaaaae
+aaaaadoaadaaoejaabaaoekaabaaookaaeaaaaaeaaaaamoaadaaeejaacaaeeka
+acaaoekaafaaaaadaaaaahiaaaaaffjabdaaoekaaeaaaaaeaaaaahiabcaaoeka
+aaaaaajaaaaaoeiaaeaaaaaeaaaaahiabeaaoekaaaaakkjaaaaaoeiaaeaaaaae
+acaaahoabfaaoekaaaaappjaaaaaoeiaafaaaaadaaaaabiaacaaaajabgaaaaka
+afaaaaadaaaaaciaacaaaajabhaaaakaafaaaaadaaaaaeiaacaaaajabiaaaaka
+afaaaaadabaaabiaacaaffjabgaaffkaafaaaaadabaaaciaacaaffjabhaaffka
+afaaaaadabaaaeiaacaaffjabiaaffkaacaaaaadaaaaahiaaaaaoeiaabaaoeia
+afaaaaadabaaabiaacaakkjabgaakkkaafaaaaadabaaaciaacaakkjabhaakkka
+afaaaaadabaaaeiaacaakkjabiaakkkaacaaaaadaaaaahiaaaaaoeiaabaaoeia
+ceaaaaacabaaahiaaaaaoeiaafaaaaadaaaaabiaabaaffiaabaaffiaaeaaaaae
+aaaaabiaabaaaaiaabaaaaiaaaaaaaibafaaaaadacaaapiaabaacjiaabaakeia
+ajaaaaadadaaabiaagaaoekaacaaoeiaajaaaaadadaaaciaahaaoekaacaaoeia
+ajaaaaadadaaaeiaaiaaoekaacaaoeiaaeaaaaaeaaaaahiaajaaoekaaaaaaaia
+adaaoeiaabaaaaacabaaaiiabjaaaakaajaaaaadacaaabiaadaaoekaabaaoeia
+ajaaaaadacaaaciaaeaaoekaabaaoeiaajaaaaadacaaaeiaafaaoekaabaaoeia
+abaaaaacabaaahoaabaaoeiaacaaaaadadaaahoaaaaaoeiaacaaoeiaafaaaaad
+aaaaapiaaaaaffjabdaaoekaaeaaaaaeaaaaapiabcaaoekaaaaaaajaaaaaoeia
+aeaaaaaeaaaaapiabeaaoekaaaaakkjaaaaaoeiaaeaaaaaeaaaaapiabfaaoeka
+aaaappjaaaaaoeiaafaaaaadabaaapiaaaaaffiaalaaoekaaeaaaaaeabaaapia
+akaaoekaaaaaaaiaabaaoeiaaeaaaaaeabaaapiaamaaoekaaaaakkiaabaaoeia
+aeaaaaaeaeaaapoaanaaoekaaaaappiaabaaoeiaafaaaaadaaaaapiaaaaaffja
+apaaoekaaeaaaaaeaaaaapiaaoaaoekaaaaaaajaaaaaoeiaaeaaaaaeaaaaapia
+baaaoekaaaaakkjaaaaaoeiaaeaaaaaeaaaaapiabbaaoekaaaaappjaaaaaoeia
+aeaaaaaeaaaaadmaaaaappiaaaaaoekaaaaaoeiaabaaaaacaaaaammaaaaaoeia
+ppppaaaafdeieefckmagaaaaeaaaabaaklabaaaafjaaaaaeegiocaaaaaaaaaaa
+amaaaaaafjaaaaaeegiocaaaabaaaaaacnaaaaaafjaaaaaeegiocaaaacaaaaaa
+amaaaaaafjaaaaaeegiocaaaadaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaa
+fpaaaaadhcbabaaaacaaaaaafpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaa
+aaaaaaaaabaaaaaagfaaaaadpccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaa
+gfaaaaadhccabaaaadaaaaaagfaaaaadhccabaaaaeaaaaaagfaaaaadpccabaaa
+afaaaaaagiaaaaacaeaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaa
+egiocaaaadaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaa
+aaaaaaaaagbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaa
+egiocaaaadaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaak
+pccabaaaaaaaaaaaegiocaaaadaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaa
+aaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaaegiacaaaaaaaaaaa
+akaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaalmccabaaaabaaaaaaagbebaaa
+adaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaaaaaaaaaaalaaaaaadiaaaaai
+bcaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaadaaaaaabaaaaaaadiaaaaai
+ccaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaadaaaaaabbaaaaaadiaaaaai
+ecaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaadaaaaaabcaaaaaadiaaaaai
+bcaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaadaaaaaabaaaaaaadiaaaaai
+ccaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaadaaaaaabbaaaaaadiaaaaai
+ecaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaadaaaaaabcaaaaaaaaaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaaibcaabaaa
+abaaaaaackbabaaaacaaaaaackiacaaaadaaaaaabaaaaaaadiaaaaaiccaabaaa
+abaaaaaackbabaaaacaaaaaackiacaaaadaaaaaabbaaaaaadiaaaaaiecaabaaa
+abaaaaaackbabaaaacaaaaaackiacaaaadaaaaaabcaaaaaaaaaaaaahhcaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaaaaaaaaaa
+egacbaaaaaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaadkaabaaa
+aaaaaaaadiaaaaahhcaabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaa
+dgaaaaafhccabaaaacaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaaabaaaaaa
+fgbfbaaaaaaaaaaaegiccaaaadaaaaaaanaaaaaadcaaaaakhcaabaaaabaaaaaa
+egiccaaaadaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaaabaaaaaadcaaaaak
+hcaabaaaabaaaaaaegiccaaaadaaaaaaaoaaaaaakgbkbaaaaaaaaaaaegacbaaa
+abaaaaaadcaaaaakhccabaaaadaaaaaaegiccaaaadaaaaaaapaaaaaapgbpbaaa
+aaaaaaaaegacbaaaabaaaaaadiaaaaahbcaabaaaabaaaaaabkaabaaaaaaaaaaa
+bkaabaaaaaaaaaaadcaaaaakbcaabaaaabaaaaaaakaabaaaaaaaaaaaakaabaaa
+aaaaaaaaakaabaiaebaaaaaaabaaaaaadiaaaaahpcaabaaaacaaaaaajgacbaaa
+aaaaaaaaegakbaaaaaaaaaaabbaaaaaibcaabaaaadaaaaaaegiocaaaabaaaaaa
+cjaaaaaaegaobaaaacaaaaaabbaaaaaiccaabaaaadaaaaaaegiocaaaabaaaaaa
+ckaaaaaaegaobaaaacaaaaaabbaaaaaiecaabaaaadaaaaaaegiocaaaabaaaaaa
+claaaaaaegaobaaaacaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaabaaaaaa
+cmaaaaaaagaabaaaabaaaaaaegacbaaaadaaaaaadgaaaaaficaabaaaaaaaaaaa
+abeaaaaaaaaaiadpbbaaaaaibcaabaaaacaaaaaaegiocaaaabaaaaaacgaaaaaa
+egaobaaaaaaaaaaabbaaaaaiccaabaaaacaaaaaaegiocaaaabaaaaaachaaaaaa
+egaobaaaaaaaaaaabbaaaaaiecaabaaaacaaaaaaegiocaaaabaaaaaaciaaaaaa
+egaobaaaaaaaaaaaaaaaaaahhccabaaaaeaaaaaaegacbaaaabaaaaaaegacbaaa
+acaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaadaaaaaa
+anaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaaamaaaaaaagbabaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaa
+aoaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaa
+egiocaaaadaaaaaaapaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadiaaaaai
+pcaabaaaabaaaaaafgafbaaaaaaaaaaaegiocaaaacaaaaaaajaaaaaadcaaaaak
+pcaabaaaabaaaaaaegiocaaaacaaaaaaaiaaaaaaagaabaaaaaaaaaaaegaobaaa
+abaaaaaadcaaaaakpcaabaaaabaaaaaaegiocaaaacaaaaaaakaaaaaakgakbaaa
+aaaaaaaaegaobaaaabaaaaaadcaaaaakpccabaaaafaaaaaaegiocaaaacaaaaaa
+alaaaaaapgapbaaaaaaaaaaaegaobaaaabaaaaaadoaaaaabejfdeheopaaaaaaa
+aiaaaaaaaiaaaaaamiaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaa
+nbaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaa
+aaaaaaaaadaaaaaaacaaaaaaahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaa
+adaaaaaaapadaaaaoaaaaaaaabaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaa
+oaaaaaaaacaaaaaaaaaaaaaaadaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaa
+aaaaaaaaadaaaaaaagaaaaaaapaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaa
+ahaaaaaaapaaaaaafaepfdejfeejepeoaafeebeoehefeofeaaeoepfcenebemaa
+feeffiedepepfceeaaedepemepfcaaklepfdeheolaaaaaaaagaaaaaaaiaaaaaa
+jiaaaaaaaaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaa
+aaaaaaaaadaaaaaaabaaaaaaapaaaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaa
+acaaaaaaahaiaaaakeaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaa
+keaaaaaaadaaaaaaaaaaaaaaadaaaaaaaeaaaaaaahaiaaaakeaaaaaaaeaaaaaa
+aaaaaaaaadaaaaaaafaaaaaaapaaaaaafdfgfpfaepfdejfeejepeoaafeeffied
+epepfceeaaklklkl"
+}
+SubProgram "d3d11_9x " {
+// Stats: 63 math
+Keywords { "DIRECTIONAL" "SHADOWS_SCREEN" "SHADOWS_NATIVE" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "VERTEXLIGHT_ON" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 192
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityLighting" 720
+Vector 32 [unity_4LightPosX0]
+Vector 48 [unity_4LightPosY0]
+Vector 64 [unity_4LightPosZ0]
+Vector 80 [unity_4LightAtten0]
+Vector 96 [unity_LightColor0]
+Vector 112 [unity_LightColor1]
+Vector 128 [unity_LightColor2]
+Vector 144 [unity_LightColor3]
+Vector 160 [unity_LightColor4]
+Vector 176 [unity_LightColor5]
+Vector 192 [unity_LightColor6]
+Vector 208 [unity_LightColor7]
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityShadows" 416
+Matrix 128 [unity_World2Shadow0]
+Matrix 192 [unity_World2Shadow1]
+Matrix 256 [unity_World2Shadow2]
+Matrix 320 [unity_World2Shadow3]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+BindCB  "UnityShadows" 2
+BindCB  "UnityPerDraw" 3
+"vs_4_0_level_9_1
+root12:aaaeaaaa
+eefiecedbbgdkhalkdfbickbgojdhpnhpjplbnkjabaaaaaanibaaaaaaeaaaaaa
+daaaaaaakiafaaaaciapaaaacabaaaaaebgpgodjhaafaaaahaafaaaaaaacpopp
+aaafaaaahaaaaaaaagaaceaaaaaagmaaaaaagmaaaaaaceaaabaagmaaaaaaakaa
+acaaabaaaaaaaaaaabaaacaaaiaaadaaaaaaaaaaabaacgaaahaaalaaaaaaaaaa
+acaaaiaaaeaabcaaaaaaaaaaadaaaaaaaeaabgaaaaaaaaaaadaaamaaahaabkaa
+aaaaaaaaaaaaaaaaaaacpoppfbaaaaafcbaaapkaaaaaiadpaaaaaaaaaaaaaaaa
+aaaaaaaabpaaaaacafaaaaiaaaaaapjabpaaaaacafaaaciaacaaapjabpaaaaac
+afaaadiaadaaapjaaeaaaaaeaaaaadoaadaaoejaabaaoekaabaaookaaeaaaaae
+aaaaamoaadaaeejaacaaeekaacaaoekaafaaaaadaaaaabiaacaaaajaboaaaaka
+afaaaaadaaaaaciaacaaaajabpaaaakaafaaaaadaaaaaeiaacaaaajacaaaaaka
+afaaaaadabaaabiaacaaffjaboaaffkaafaaaaadabaaaciaacaaffjabpaaffka
+afaaaaadabaaaeiaacaaffjacaaaffkaacaaaaadaaaaahiaaaaaoeiaabaaoeia
+afaaaaadabaaabiaacaakkjaboaakkkaafaaaaadabaaaciaacaakkjabpaakkka
+afaaaaadabaaaeiaacaakkjacaaakkkaacaaaaadaaaaahiaaaaaoeiaabaaoeia
+ceaaaaacabaaahiaaaaaoeiaafaaaaadaaaaabiaabaaffiaabaaffiaaeaaaaae
+aaaaabiaabaaaaiaabaaaaiaaaaaaaibafaaaaadacaaapiaabaacjiaabaakeia
+ajaaaaadadaaabiaaoaaoekaacaaoeiaajaaaaadadaaaciaapaaoekaacaaoeia
+ajaaaaadadaaaeiabaaaoekaacaaoeiaaeaaaaaeaaaaahiabbaaoekaaaaaaaia
+adaaoeiaabaaaaacabaaaiiacbaaaakaajaaaaadacaaabiaalaaoekaabaaoeia
+ajaaaaadacaaaciaamaaoekaabaaoeiaajaaaaadacaaaeiaanaaoekaabaaoeia
+acaaaaadaaaaahiaaaaaoeiaacaaoeiaafaaaaadacaaahiaaaaaffjablaaoeka
+aeaaaaaeacaaahiabkaaoekaaaaaaajaacaaoeiaaeaaaaaeacaaahiabmaaoeka
+aaaakkjaacaaoeiaaeaaaaaeacaaahiabnaaoekaaaaappjaacaaoeiaacaaaaad
+adaaapiaacaaffibaeaaoekaafaaaaadaeaaapiaabaaffiaadaaoeiaafaaaaad
+adaaapiaadaaoeiaadaaoeiaacaaaaadafaaapiaacaaaaibadaaoekaaeaaaaae
+aeaaapiaafaaoeiaabaaaaiaaeaaoeiaaeaaaaaeadaaapiaafaaoeiaafaaoeia
+adaaoeiaacaaaaadafaaapiaacaakkibafaaoekaabaaaaacacaaahoaacaaoeia
+aeaaaaaeacaaapiaafaaoeiaabaakkiaaeaaoeiaabaaaaacabaaahoaabaaoeia
+aeaaaaaeabaaapiaafaaoeiaafaaoeiaadaaoeiaahaaaaacadaaabiaabaaaaia
+ahaaaaacadaaaciaabaaffiaahaaaaacadaaaeiaabaakkiaahaaaaacadaaaiia
+abaappiaabaaaaacaeaaabiacbaaaakaaeaaaaaeabaaapiaabaaoeiaagaaoeka
+aeaaaaiaafaaaaadacaaapiaacaaoeiaadaaoeiaalaaaaadacaaapiaacaaoeia
+cbaaffkaagaaaaacadaaabiaabaaaaiaagaaaaacadaaaciaabaaffiaagaaaaac
+adaaaeiaabaakkiaagaaaaacadaaaiiaabaappiaafaaaaadabaaapiaacaaoeia
+adaaoeiaafaaaaadacaaahiaabaaffiaaiaaoekaaeaaaaaeacaaahiaahaaoeka
+abaaaaiaacaaoeiaaeaaaaaeabaaahiaajaaoekaabaakkiaacaaoeiaaeaaaaae
+abaaahiaakaaoekaabaappiaabaaoeiaacaaaaadadaaahoaaaaaoeiaabaaoeia
+afaaaaadaaaaapiaaaaaffjablaaoekaaeaaaaaeaaaaapiabkaaoekaaaaaaaja
+aaaaoeiaaeaaaaaeaaaaapiabmaaoekaaaaakkjaaaaaoeiaaeaaaaaeaaaaapia
+bnaaoekaaaaappjaaaaaoeiaafaaaaadabaaapiaaaaaffiabdaaoekaaeaaaaae
+abaaapiabcaaoekaaaaaaaiaabaaoeiaaeaaaaaeabaaapiabeaaoekaaaaakkia
+abaaoeiaaeaaaaaeaeaaapoabfaaoekaaaaappiaabaaoeiaafaaaaadaaaaapia
+aaaaffjabhaaoekaaeaaaaaeaaaaapiabgaaoekaaaaaaajaaaaaoeiaaeaaaaae
+aaaaapiabiaaoekaaaaakkjaaaaaoeiaaeaaaaaeaaaaapiabjaaoekaaaaappja
+aaaaoeiaaeaaaaaeaaaaadmaaaaappiaaaaaoekaaaaaoeiaabaaaaacaaaaamma
+aaaaoeiappppaaaafdeieefchiajaaaaeaaaabaafoacaaaafjaaaaaeegiocaaa
+aaaaaaaaamaaaaaafjaaaaaeegiocaaaabaaaaaacnaaaaaafjaaaaaeegiocaaa
+acaaaaaaamaaaaaafjaaaaaeegiocaaaadaaaaaabdaaaaaafpaaaaadpcbabaaa
+aaaaaaaafpaaaaadhcbabaaaacaaaaaafpaaaaaddcbabaaaadaaaaaaghaaaaae
+pccabaaaaaaaaaaaabaaaaaagfaaaaadpccabaaaabaaaaaagfaaaaadhccabaaa
+acaaaaaagfaaaaadhccabaaaadaaaaaagfaaaaadhccabaaaaeaaaaaagfaaaaad
+pccabaaaafaaaaaagiaaaaacagaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaa
+aaaaaaaaegiocaaaadaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaa
+adaaaaaaaaaaaaaaagbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaa
+aaaaaaaaegiocaaaadaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaa
+dcaaaaakpccabaaaaaaaaaaaegiocaaaadaaaaaaadaaaaaapgbpbaaaaaaaaaaa
+egaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaaegiacaaa
+aaaaaaaaakaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaalmccabaaaabaaaaaa
+agbebaaaadaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaaaaaaaaaaalaaaaaa
+diaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaadaaaaaabaaaaaaa
+diaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaadaaaaaabbaaaaaa
+diaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaadaaaaaabcaaaaaa
+diaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaadaaaaaabaaaaaaa
+diaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaadaaaaaabbaaaaaa
+diaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaadaaaaaabcaaaaaa
+aaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaai
+bcaabaaaabaaaaaackbabaaaacaaaaaackiacaaaadaaaaaabaaaaaaadiaaaaai
+ccaabaaaabaaaaaackbabaaaacaaaaaackiacaaaadaaaaaabbaaaaaadiaaaaai
+ecaabaaaabaaaaaackbabaaaacaaaaaackiacaaaadaaaaaabcaaaaaaaaaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaa
+dkaabaaaaaaaaaaadiaaaaahhcaabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaa
+aaaaaaaadgaaaaafhccabaaaacaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaa
+abaaaaaafgbfbaaaaaaaaaaaegiccaaaadaaaaaaanaaaaaadcaaaaakhcaabaaa
+abaaaaaaegiccaaaadaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaaabaaaaaa
+dcaaaaakhcaabaaaabaaaaaaegiccaaaadaaaaaaaoaaaaaakgbkbaaaaaaaaaaa
+egacbaaaabaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaadaaaaaaapaaaaaa
+pgbpbaaaaaaaaaaaegacbaaaabaaaaaadgaaaaafhccabaaaadaaaaaaegacbaaa
+abaaaaaadiaaaaahicaabaaaabaaaaaabkaabaaaaaaaaaaabkaabaaaaaaaaaaa
+dcaaaaakicaabaaaabaaaaaaakaabaaaaaaaaaaaakaabaaaaaaaaaaadkaabaia
+ebaaaaaaabaaaaaadiaaaaahpcaabaaaacaaaaaajgacbaaaaaaaaaaaegakbaaa
+aaaaaaaabbaaaaaibcaabaaaadaaaaaaegiocaaaabaaaaaacjaaaaaaegaobaaa
+acaaaaaabbaaaaaiccaabaaaadaaaaaaegiocaaaabaaaaaackaaaaaaegaobaaa
+acaaaaaabbaaaaaiecaabaaaadaaaaaaegiocaaaabaaaaaaclaaaaaaegaobaaa
+acaaaaaadcaaaaakhcaabaaaacaaaaaaegiccaaaabaaaaaacmaaaaaapgapbaaa
+abaaaaaaegacbaaaadaaaaaadgaaaaaficaabaaaaaaaaaaaabeaaaaaaaaaiadp
+bbaaaaaibcaabaaaadaaaaaaegiocaaaabaaaaaacgaaaaaaegaobaaaaaaaaaaa
+bbaaaaaiccaabaaaadaaaaaaegiocaaaabaaaaaachaaaaaaegaobaaaaaaaaaaa
+bbaaaaaiecaabaaaadaaaaaaegiocaaaabaaaaaaciaaaaaaegaobaaaaaaaaaaa
+aaaaaaahhcaabaaaacaaaaaaegacbaaaacaaaaaaegacbaaaadaaaaaaaaaaaaaj
+pcaabaaaadaaaaaafgafbaiaebaaaaaaabaaaaaaegiocaaaabaaaaaaadaaaaaa
+diaaaaahpcaabaaaaeaaaaaafgafbaaaaaaaaaaaegaobaaaadaaaaaadiaaaaah
+pcaabaaaadaaaaaaegaobaaaadaaaaaaegaobaaaadaaaaaaaaaaaaajpcaabaaa
+afaaaaaaagaabaiaebaaaaaaabaaaaaaegiocaaaabaaaaaaacaaaaaaaaaaaaaj
+pcaabaaaabaaaaaakgakbaiaebaaaaaaabaaaaaaegiocaaaabaaaaaaaeaaaaaa
+dcaaaaajpcaabaaaaeaaaaaaegaobaaaafaaaaaaagaabaaaaaaaaaaaegaobaaa
+aeaaaaaadcaaaaajpcaabaaaaaaaaaaaegaobaaaabaaaaaakgakbaaaaaaaaaaa
+egaobaaaaeaaaaaadcaaaaajpcaabaaaadaaaaaaegaobaaaafaaaaaaegaobaaa
+afaaaaaaegaobaaaadaaaaaadcaaaaajpcaabaaaabaaaaaaegaobaaaabaaaaaa
+egaobaaaabaaaaaaegaobaaaadaaaaaaeeaaaaafpcaabaaaadaaaaaaegaobaaa
+abaaaaaadcaaaaanpcaabaaaabaaaaaaegaobaaaabaaaaaaegiocaaaabaaaaaa
+afaaaaaaaceaaaaaaaaaiadpaaaaiadpaaaaiadpaaaaiadpaoaaaaakpcaabaaa
+abaaaaaaaceaaaaaaaaaiadpaaaaiadpaaaaiadpaaaaiadpegaobaaaabaaaaaa
+diaaaaahpcaabaaaaaaaaaaaegaobaaaaaaaaaaaegaobaaaadaaaaaadeaaaaak
+pcaabaaaaaaaaaaaegaobaaaaaaaaaaaaceaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaadiaaaaahpcaabaaaaaaaaaaaegaobaaaabaaaaaaegaobaaaaaaaaaaa
+diaaaaaihcaabaaaabaaaaaafgafbaaaaaaaaaaaegiccaaaabaaaaaaahaaaaaa
+dcaaaaakhcaabaaaabaaaaaaegiccaaaabaaaaaaagaaaaaaagaabaaaaaaaaaaa
+egacbaaaabaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaabaaaaaaaiaaaaaa
+kgakbaaaaaaaaaaaegacbaaaabaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaa
+abaaaaaaajaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaaaaaaaaahhccabaaa
+aeaaaaaaegacbaaaaaaaaaaaegacbaaaacaaaaaadiaaaaaipcaabaaaaaaaaaaa
+fgbfbaaaaaaaaaaaegiocaaaadaaaaaaanaaaaaadcaaaaakpcaabaaaaaaaaaaa
+egiocaaaadaaaaaaamaaaaaaagbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaak
+pcaabaaaaaaaaaaaegiocaaaadaaaaaaaoaaaaaakgbkbaaaaaaaaaaaegaobaaa
+aaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaaapaaaaaapgbpbaaa
+aaaaaaaaegaobaaaaaaaaaaadiaaaaaipcaabaaaabaaaaaafgafbaaaaaaaaaaa
+egiocaaaacaaaaaaajaaaaaadcaaaaakpcaabaaaabaaaaaaegiocaaaacaaaaaa
+aiaaaaaaagaabaaaaaaaaaaaegaobaaaabaaaaaadcaaaaakpcaabaaaabaaaaaa
+egiocaaaacaaaaaaakaaaaaakgakbaaaaaaaaaaaegaobaaaabaaaaaadcaaaaak
+pccabaaaafaaaaaaegiocaaaacaaaaaaalaaaaaapgapbaaaaaaaaaaaegaobaaa
+abaaaaaadoaaaaabejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaaaaaaaaaa
+aaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaaadaaaaaa
+abaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaaahahaaaa
+oaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaaabaaaaaa
+aaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaaadaaaaaa
+afaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaaapaaaaaa
+ojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdejfeejepeo
+aafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepemepfcaakl
+epfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaaaaaaaaaaabaaaaaaadaaaaaa
+aaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapaaaaaa
+keaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaakeaaaaaaacaaaaaa
+aaaaaaaaadaaaaaaadaaaaaaahaiaaaakeaaaaaaadaaaaaaaaaaaaaaadaaaaaa
+aeaaaaaaahaiaaaakeaaaaaaaeaaaaaaaaaaaaaaadaaaaaaafaaaaaaapaaaaaa
+fdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklkl"
+}
+}
+Program "fp" {
+SubProgram "d3d9 " {
+// Stats: 11 math, 2 textures
+Keywords { "DIRECTIONAL" "SHADOWS_OFF" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" }
+Vector 2 [_Color]
+Vector 1 [_LightColor0]
+Vector 0 [_WorldSpaceLightPos0]
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+"ps_2_0
+def c3, 0, 1, 0, 0
+dcl t0
+dcl_pp t1.xyz
+dcl_pp t3.xyz
+dcl_2d s0
+dcl_2d s1
+mov r0.x, t0.z
+mov r0.y, t0.w
+texld_pp r1, t0, s0
+texld r0, r0, s1
+dp3_pp r1.w, t1, c0
+max_pp r0.x, r1.w, c3.x
+mul_pp r1.xyz, r1, c2
+mul_pp r2.xyz, r1, c1
+mul_pp r3.xyz, r1, t3
+mad_pp r0.xyz, r2, r0.x, r3
+mad_pp r0.xyz, r1, r0.w, r0
+mov_pp r0.w, c3.y
+mov_pp oC0, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 7 math, 2 textures
+Keywords { "DIRECTIONAL" "SHADOWS_OFF" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" }
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+ConstBuffer "$Globals" 192
+Vector 96 [_LightColor0]
+Vector 144 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+"ps_4_0
+root12:acacacaa
+eefiecedfcdloegkcmoapecfcijhbphonhonphekabaaaaaaoaacaaaaadaaaaaa
+cmaaaaaammaaaaaaaaabaaaaejfdeheojiaaaaaaafaaaaaaaiaaaaaaiaaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaaimaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapapaaaaimaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaimaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaaaaaaimaaaaaa
+adaaaaaaaaaaaaaaadaaaaaaaeaaaaaaahahaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklklepfdeheocmaaaaaaabaaaaaaaiaaaaaacaaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapaaaaaafdfgfpfegbhcghgfheaaklkl
+fdeieefcniabaaaaeaaaaaaahgaaaaaafjaaaaaeegiocaaaaaaaaaaaakaaaaaa
+fjaaaaaeegiocaaaabaaaaaaabaaaaaafkaaaaadaagabaaaaaaaaaaafkaaaaad
+aagabaaaabaaaaaafibiaaaeaahabaaaaaaaaaaaffffaaaafibiaaaeaahabaaa
+abaaaaaaffffaaaagcbaaaadpcbabaaaabaaaaaagcbaaaadhcbabaaaacaaaaaa
+gcbaaaadhcbabaaaaeaaaaaagfaaaaadpccabaaaaaaaaaaagiaaaaacadaaaaaa
+baaaaaaibcaabaaaaaaaaaaaegbcbaaaacaaaaaaegiccaaaabaaaaaaaaaaaaaa
+deaaaaahbcaabaaaaaaaaaaaakaabaaaaaaaaaaaabeaaaaaaaaaaaaaefaaaaaj
+pcaabaaaabaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaaaaaaaaaa
+diaaaaaiocaabaaaaaaaaaaaagajbaaaabaaaaaaagijcaaaaaaaaaaaajaaaaaa
+diaaaaaihcaabaaaabaaaaaajgahbaaaaaaaaaaaegiccaaaaaaaaaaaagaaaaaa
+diaaaaahhcaabaaaacaaaaaajgahbaaaaaaaaaaaegbcbaaaaeaaaaaadcaaaaaj
+hcaabaaaabaaaaaaegacbaaaabaaaaaaagaabaaaaaaaaaaaegacbaaaacaaaaaa
+efaaaaajpcaabaaaacaaaaaaogbkbaaaabaaaaaaeghobaaaabaaaaaaaagabaaa
+abaaaaaadcaaaaajhccabaaaaaaaaaaajgahbaaaaaaaaaaapgapbaaaacaaaaaa
+egacbaaaabaaaaaadgaaaaaficcabaaaaaaaaaaaabeaaaaaaaaaiadpdoaaaaab
+"
+}
+SubProgram "d3d11_9x " {
+// Stats: 7 math, 2 textures
+Keywords { "DIRECTIONAL" "SHADOWS_OFF" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" }
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+ConstBuffer "$Globals" 192
+Vector 96 [_LightColor0]
+Vector 144 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+"ps_4_0_level_9_1
+root12:acacacaa
+eefiecedlphejnafhdgmcejldfoedlmnalmiofnbabaaaaaagaaeaaaaaeaaaaaa
+daaaaaaakmabaaaaimadaaaacmaeaaaaebgpgodjheabaaaaheabaaaaaaacpppp
+ceabaaaafaaaaaaaadaacmaaaaaafaaaaaaafaaaacaaceaaaaaafaaaaaaaaaaa
+abababaaaaaaagaaabaaaaaaaaaaaaaaaaaaajaaabaaabaaaaaaaaaaabaaaaaa
+abaaacaaaaaaaaaaaaacppppfbaaaaafadaaapkaaaaaaaaaaaaaiadpaaaaaaaa
+aaaaaaaabpaaaaacaaaaaaiaaaaaaplabpaaaaacaaaaaaiaabaachlabpaaaaac
+aaaaaaiaadaachlabpaaaaacaaaaaajaaaaiapkabpaaaaacaaaaaajaabaiapka
+abaaaaacaaaaabiaaaaakklaabaaaaacaaaaaciaaaaapplaecaaaaadabaacpia
+aaaaoelaaaaioekaecaaaaadaaaaapiaaaaaoeiaabaioekaaiaaaaadabaaciia
+abaaoelaacaaoekaalaaaaadaaaacbiaabaappiaadaaaakaafaaaaadabaachia
+abaaoeiaabaaoekaafaaaaadacaachiaabaaoeiaaaaaoekaafaaaaadadaachia
+abaaoeiaadaaoelaaeaaaaaeaaaachiaacaaoeiaaaaaaaiaadaaoeiaaeaaaaae
+aaaachiaabaaoeiaaaaappiaaaaaoeiaabaaaaacaaaaciiaadaaffkaabaaaaac
+aaaicpiaaaaaoeiappppaaaafdeieefcniabaaaaeaaaaaaahgaaaaaafjaaaaae
+egiocaaaaaaaaaaaakaaaaaafjaaaaaeegiocaaaabaaaaaaabaaaaaafkaaaaad
+aagabaaaaaaaaaaafkaaaaadaagabaaaabaaaaaafibiaaaeaahabaaaaaaaaaaa
+ffffaaaafibiaaaeaahabaaaabaaaaaaffffaaaagcbaaaadpcbabaaaabaaaaaa
+gcbaaaadhcbabaaaacaaaaaagcbaaaadhcbabaaaaeaaaaaagfaaaaadpccabaaa
+aaaaaaaagiaaaaacadaaaaaabaaaaaaibcaabaaaaaaaaaaaegbcbaaaacaaaaaa
+egiccaaaabaaaaaaaaaaaaaadeaaaaahbcaabaaaaaaaaaaaakaabaaaaaaaaaaa
+abeaaaaaaaaaaaaaefaaaaajpcaabaaaabaaaaaaegbabaaaabaaaaaaeghobaaa
+aaaaaaaaaagabaaaaaaaaaaadiaaaaaiocaabaaaaaaaaaaaagajbaaaabaaaaaa
+agijcaaaaaaaaaaaajaaaaaadiaaaaaihcaabaaaabaaaaaajgahbaaaaaaaaaaa
+egiccaaaaaaaaaaaagaaaaaadiaaaaahhcaabaaaacaaaaaajgahbaaaaaaaaaaa
+egbcbaaaaeaaaaaadcaaaaajhcaabaaaabaaaaaaegacbaaaabaaaaaaagaabaaa
+aaaaaaaaegacbaaaacaaaaaaefaaaaajpcaabaaaacaaaaaaogbkbaaaabaaaaaa
+eghobaaaabaaaaaaaagabaaaabaaaaaadcaaaaajhccabaaaaaaaaaaajgahbaaa
+aaaaaaaapgapbaaaacaaaaaaegacbaaaabaaaaaadgaaaaaficcabaaaaaaaaaaa
+abeaaaaaaaaaiadpdoaaaaabejfdeheojiaaaaaaafaaaaaaaiaaaaaaiaaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaaimaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapapaaaaimaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaimaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaaaaaaimaaaaaa
+adaaaaaaaaaaaaaaadaaaaaaaeaaaaaaahahaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklklepfdeheocmaaaaaaabaaaaaaaiaaaaaacaaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapaaaaaafdfgfpfegbhcghgfheaaklkl
+"
+}
+SubProgram "d3d9 " {
+// Stats: 12 math, 3 textures
+Keywords { "DIRECTIONAL" "SHADOWS_SCREEN" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" }
+Vector 2 [_Color]
+Vector 1 [_LightColor0]
+Vector 0 [_WorldSpaceLightPos0]
+SetTexture 0 [_ShadowMapTexture] 2D 0
+SetTexture 1 [_MainTex] 2D 1
+SetTexture 2 [_Illum] 2D 2
+"ps_2_0
+def c3, 0, 1, 0, 0
+dcl t0
+dcl_pp t1.xyz
+dcl_pp t3.xyz
+dcl_pp t4
+dcl_2d s0
+dcl_2d s1
+dcl_2d s2
+mov r0.x, t0.z
+mov r0.y, t0.w
+texldp_pp r1, t4, s0
+texld_pp r2, t0, s1
+texld r0, r0, s2
+dp3_pp r2.w, t1, c0
+max_pp r0.x, r2.w, c3.x
+mul_pp r1.xyz, r1.x, c1
+mul_pp r2.xyz, r2, c2
+mul_pp r1.xyz, r1, r2
+mul_pp r3.xyz, r2, t3
+mad_pp r0.xyz, r1, r0.x, r3
+mad_pp r0.xyz, r2, r0.w, r0
+mov_pp r0.w, c3.y
+mov_pp oC0, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 9 math, 3 textures
+Keywords { "DIRECTIONAL" "SHADOWS_SCREEN" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" }
+SetTexture 0 [_MainTex] 2D 1
+SetTexture 1 [_Illum] 2D 2
+SetTexture 2 [_ShadowMapTexture] 2D 0
+ConstBuffer "$Globals" 192
+Vector 96 [_LightColor0]
+Vector 144 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+"ps_4_0
+root12:adacadaa
+eefiecedmfebhpppobncbibdhbcjnnlbcdkfbkmfabaaaaaahmadaaaaadaaaaaa
+cmaaaaaaoeaaaaaabiabaaaaejfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapapaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaakeaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaaaaaakeaaaaaa
+adaaaaaaaaaaaaaaadaaaaaaaeaaaaaaahahaaaakeaaaaaaaeaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapalaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfcee
+aaklklklepfdeheocmaaaaaaabaaaaaaaiaaaaaacaaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaaaaaaaaaapaaaaaafdfgfpfegbhcghgfheaaklklfdeieefcfmacaaaa
+eaaaaaaajhaaaaaafjaaaaaeegiocaaaaaaaaaaaakaaaaaafjaaaaaeegiocaaa
+abaaaaaaabaaaaaafkaaaaadaagabaaaaaaaaaaafkaaaaadaagabaaaabaaaaaa
+fkaaaaadaagabaaaacaaaaaafibiaaaeaahabaaaaaaaaaaaffffaaaafibiaaae
+aahabaaaabaaaaaaffffaaaafibiaaaeaahabaaaacaaaaaaffffaaaagcbaaaad
+pcbabaaaabaaaaaagcbaaaadhcbabaaaacaaaaaagcbaaaadhcbabaaaaeaaaaaa
+gcbaaaadlcbabaaaafaaaaaagfaaaaadpccabaaaaaaaaaaagiaaaaacadaaaaaa
+baaaaaaibcaabaaaaaaaaaaaegbcbaaaacaaaaaaegiccaaaabaaaaaaaaaaaaaa
+deaaaaahbcaabaaaaaaaaaaaakaabaaaaaaaaaaaabeaaaaaaaaaaaaaaoaaaaah
+gcaabaaaaaaaaaaaagbbbaaaafaaaaaapgbpbaaaafaaaaaaefaaaaajpcaabaaa
+abaaaaaajgafbaaaaaaaaaaaeghobaaaacaaaaaaaagabaaaaaaaaaaadiaaaaai
+ocaabaaaaaaaaaaaagaabaaaabaaaaaaagijcaaaaaaaaaaaagaaaaaaefaaaaaj
+pcaabaaaabaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaaabaaaaaa
+diaaaaaihcaabaaaabaaaaaaegacbaaaabaaaaaaegiccaaaaaaaaaaaajaaaaaa
+diaaaaahocaabaaaaaaaaaaafgaobaaaaaaaaaaaagajbaaaabaaaaaadiaaaaah
+hcaabaaaacaaaaaaegacbaaaabaaaaaaegbcbaaaaeaaaaaadcaaaaajhcaabaaa
+aaaaaaaajgahbaaaaaaaaaaaagaabaaaaaaaaaaaegacbaaaacaaaaaaefaaaaaj
+pcaabaaaacaaaaaaogbkbaaaabaaaaaaeghobaaaabaaaaaaaagabaaaacaaaaaa
+dcaaaaajhccabaaaaaaaaaaaegacbaaaabaaaaaapgapbaaaacaaaaaaegacbaaa
+aaaaaaaadgaaaaaficcabaaaaaaaaaaaabeaaaaaaaaaiadpdoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 10 math, 2 textures
+Keywords { "DIRECTIONAL" "SHADOWS_SCREEN" "SHADOWS_NATIVE" "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" }
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+SetTexture 15 [_ShadowMapTexture] 2D 15
+ConstBuffer "$Globals" 192
+Vector 96 [_LightColor0]
+Vector 144 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+ConstBuffer "UnityShadows" 416
+Vector 384 [_LightShadowData]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+BindCB  "UnityShadows" 2
+"ps_4_0_level_9_1
+root12:baadbaaa
+eefiecedcmmaaiaojgbfdjlfbafbmloplbnoglobabaaaaaamaafaaaaafaaaaaa
+deaaaaaabiacaaaameaeaaaaneaeaaaaimafaaaaebgpgodjnmabaaaanmabaaaa
+aaacpppphmabaaaagaaaaaaaaeaadaaaaaaagaaaaaaagaaaadaaceaaaaaagaaa
+apapaaaaaaaaabaaababacaaaaaaagaaabaaaaaaaaaaaaaaaaaaajaaabaaabaa
+aaaaaaaaabaaaaaaabaaacaaaaaaaaaaacaabiaaabaaadaaaaaaaaaaaaacpppp
+fbaaaaafaeaaapkaaaaaiadpaaaaaaaaaaaaaaaaaaaaaaaabpaaaaacaaaaaaia
+aaaaaplabpaaaaacaaaaaaiaabaachlabpaaaaacaaaaaaiaadaachlabpaaaaac
+aaaaaaiaaeaacplabpaaaaacaaaaaajaaaaiapkabpaaaaacaaaaaajaabaiapka
+bpaaaaacaaaaaajaacaiapkaabaaaaacaaaaabiaaaaakklaabaaaaacaaaaacia
+aaaapplaecaaaaadabaacpiaaeaaoelaaaaioekaecaaaaadacaacpiaaaaaoela
+abaioekaecaaaaadaaaaapiaaaaaoeiaacaioekaaiaaaaadacaaciiaabaaoela
+acaaoekaalaaaaadaaaacbiaacaappiaaeaaffkaabaaaaacacaaaiiaaeaaaaka
+bcaaaaaeaaaacciaabaaaaiaacaappiaadaaaakaafaaaaadabaachiaaaaaffia
+aaaaoekaafaaaaadacaachiaacaaoeiaabaaoekaafaaaaadabaachiaabaaoeia
+acaaoeiaafaaaaadadaachiaacaaoeiaadaaoelaaeaaaaaeaaaachiaabaaoeia
+aaaaaaiaadaaoeiaaeaaaaaeaaaachiaacaaoeiaaaaappiaaaaaoeiaabaaaaac
+aaaaciiaaeaaaakaabaaaaacaaaicpiaaaaaoeiappppaaaafdeieefckeacaaaa
+eaaaaaaakjaaaaaafjaaaaaeegiocaaaaaaaaaaaakaaaaaafjaaaaaeegiocaaa
+abaaaaaaabaaaaaafjaaaaaeegiocaaaacaaaaaabjaaaaaafkaaaaadaagabaaa
+aaaaaaaafkaaaaadaagabaaaabaaaaaafkaiaaadaagabaaaapaaaaaafibiaaae
+aahabaaaaaaaaaaaffffaaaafibiaaaeaahabaaaabaaaaaaffffaaaafibiaaae
+aahabaaaapaaaaaaffffaaaagcbaaaadpcbabaaaabaaaaaagcbaaaadhcbabaaa
+acaaaaaagcbaaaadhcbabaaaaeaaaaaagcbaaaadhcbabaaaafaaaaaagfaaaaad
+pccabaaaaaaaaaaagiaaaaacadaaaaaabaaaaaaibcaabaaaaaaaaaaaegbcbaaa
+acaaaaaaegiccaaaabaaaaaaaaaaaaaadeaaaaahbcaabaaaaaaaaaaaakaabaaa
+aaaaaaaaabeaaaaaaaaaaaaaehaaaaalccaabaaaaaaaaaaaegbabaaaafaaaaaa
+aghabaaaapaaaaaaaagabaaaapaaaaaackbabaaaafaaaaaaaaaaaaajecaabaaa
+aaaaaaaaakiacaiaebaaaaaaacaaaaaabiaaaaaaabeaaaaaaaaaiadpdcaaaaak
+ccaabaaaaaaaaaaabkaabaaaaaaaaaaackaabaaaaaaaaaaaakiacaaaacaaaaaa
+biaaaaaadiaaaaaiocaabaaaaaaaaaaafgafbaaaaaaaaaaaagijcaaaaaaaaaaa
+agaaaaaaefaaaaajpcaabaaaabaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaa
+aagabaaaaaaaaaaadiaaaaaihcaabaaaabaaaaaaegacbaaaabaaaaaaegiccaaa
+aaaaaaaaajaaaaaadiaaaaahocaabaaaaaaaaaaafgaobaaaaaaaaaaaagajbaaa
+abaaaaaadiaaaaahhcaabaaaacaaaaaaegacbaaaabaaaaaaegbcbaaaaeaaaaaa
+dcaaaaajhcaabaaaaaaaaaaajgahbaaaaaaaaaaaagaabaaaaaaaaaaaegacbaaa
+acaaaaaaefaaaaajpcaabaaaacaaaaaaogbkbaaaabaaaaaaeghobaaaabaaaaaa
+aagabaaaabaaaaaadcaaaaajhccabaaaaaaaaaaaegacbaaaabaaaaaapgapbaaa
+acaaaaaaegacbaaaaaaaaaaadgaaaaaficcabaaaaaaaaaaaabeaaaaaaaaaiadp
+doaaaaabfdegejdaaiaaaaaaiaaaaaaaaaaaaaaaejfdeheolaaaaaaaagaaaaaa
+aiaaaaaajiaaaaaaaaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaakeaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapapaaaakeaaaaaaabaaaaaaaaaaaaaa
+adaaaaaaacaaaaaaahahaaaakeaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaa
+ahaaaaaakeaaaaaaadaaaaaaaaaaaaaaadaaaaaaaeaaaaaaahahaaaakeaaaaaa
+aeaaaaaaaaaaaaaaadaaaaaaafaaaaaaapahaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklklepfdeheocmaaaaaaabaaaaaaaiaaaaaacaaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapaaaaaafdfgfpfegbhcghgfheaaklkl
+"
+}
+}
+ }
+
+
+ // Stats for Vertex shader:
+ //       d3d11 : 23 math
+ //    d3d11_9x : 23 math
+ //        d3d9 : 14 math
+ // Stats for Fragment shader:
+ //       d3d11 : 13 avg math (5..21), 2 avg texture (1..3)
+ //    d3d11_9x : 13 avg math (5..21), 2 avg texture (1..3)
+ //        d3d9 : 15 avg math (7..23), 2 avg texture (1..3)
+ Pass {
+  Name "FORWARD"
+  Tags { "LIGHTMODE"="ForwardAdd" "RenderType"="Opaque" }
+  ZWrite Off
+  Blend One One
+  GpuProgramID 123889
+Program "vp" {
+SubProgram "d3d9 " {
+// Stats: 14 math
+Keywords { "POINT" }
+Bind "vertex" Vertex
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+Matrix 4 [_Object2World] 3
+Matrix 7 [_World2Object] 3
+Matrix 0 [glstate_matrix_mvp]
+Vector 10 [_MainTex_ST]
+"vs_2_0
+dcl_position v0
+dcl_normal v1
+dcl_texcoord v2
+dp4 oPos.x, c0, v0
+dp4 oPos.y, c1, v0
+dp4 oPos.z, c2, v0
+dp4 oPos.w, c3, v0
+mad oT0.xy, v2, c10, c10.zwzw
+dp4 oT2.x, c4, v0
+dp4 oT2.y, c5, v0
+dp4 oT2.z, c6, v0
+mul r0.xyz, v1.y, c8
+mad r0.xyz, c7, v1.x, r0
+mad r0.xyz, c9, v1.z, r0
+dp3 r0.w, r0, r0
+rsq r0.w, r0.w
+mul oT1.xyz, r0.w, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 23 math
+Keywords { "POINT" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 240
+Vector 224 [_MainTex_ST]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerDraw" 1
+"vs_4_0
+root12:aaacaaaa
+eefiecednophaijpcjkhbcefiaooglnlhcpkdecaabaaaaaaeaafaaaaadaaaaaa
+cmaaaaaaceabaaaakmabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+adamaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaaheaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklklfdeieefcimadaaaaeaaaabaaodaaaaaafjaaaaae
+egiocaaaaaaaaaaaapaaaaaafjaaaaaeegiocaaaabaaaaaabdaaaaaafpaaaaad
+pcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaafpaaaaaddcbabaaaadaaaaaa
+ghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaaddccabaaaabaaaaaagfaaaaad
+hccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaagiaaaaacacaaaaaadiaaaaai
+pcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaabaaaaaaabaaaaaadcaaaaak
+pcaabaaaaaaaaaaaegiocaaaabaaaaaaaaaaaaaaagbabaaaaaaaaaaaegaobaaa
+aaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaabaaaaaaacaaaaaakgbkbaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaakpccabaaaaaaaaaaaegiocaaaabaaaaaa
+adaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaa
+egbabaaaadaaaaaaegiacaaaaaaaaaaaaoaaaaaaogikcaaaaaaaaaaaaoaaaaaa
+diaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabaaaaaaa
+diaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabbaaaaaa
+diaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabcaaaaaa
+diaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabaaaaaaa
+diaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabbaaaaaa
+diaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabcaaaaaa
+aaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaai
+bcaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabaaaaaaadiaaaaai
+ccaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabbaaaaaadiaaaaai
+ecaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabcaaaaaaaaaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaa
+dkaabaaaaaaaaaaadiaaaaahhccabaaaacaaaaaapgapbaaaaaaaaaaaegacbaaa
+aaaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiccaaaabaaaaaa
+anaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaabaaaaaaamaaaaaaagbabaaa
+aaaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaabaaaaaa
+aoaaaaaakgbkbaaaaaaaaaaaegacbaaaaaaaaaaadcaaaaakhccabaaaadaaaaaa
+egiccaaaabaaaaaaapaaaaaapgbpbaaaaaaaaaaaegacbaaaaaaaaaaadoaaaaab
+"
+}
+SubProgram "d3d11_9x " {
+// Stats: 23 math
+Keywords { "POINT" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 240
+Vector 224 [_MainTex_ST]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerDraw" 1
+"vs_4_0_level_9_1
+root12:aaacaaaa
+eefiecedhllkjadkodggoogckccnphpoodpampkgabaaaaaagmahaaaaaeaaaaaa
+daaaaaaafiacaaaaomafaaaaoeagaaaaebgpgodjcaacaaaacaacaaaaaaacpopp
+neabaaaaemaaaaaaadaaceaaaaaaeiaaaaaaeiaaaaaaceaaabaaeiaaaaaaaoaa
+abaaabaaaaaaaaaaabaaaaaaaeaaacaaaaaaaaaaabaaamaaahaaagaaaaaaaaaa
+aaaaaaaaaaacpoppbpaaaaacafaaaaiaaaaaapjabpaaaaacafaaaciaacaaapja
+bpaaaaacafaaadiaadaaapjaaeaaaaaeaaaaadoaadaaoejaabaaoekaabaaooka
+afaaaaadaaaaahiaaaaaffjaahaaoekaaeaaaaaeaaaaahiaagaaoekaaaaaaaja
+aaaaoeiaaeaaaaaeaaaaahiaaiaaoekaaaaakkjaaaaaoeiaaeaaaaaeacaaahoa
+ajaaoekaaaaappjaaaaaoeiaafaaaaadaaaaabiaacaaaajaakaaaakaafaaaaad
+aaaaaciaacaaaajaalaaaakaafaaaaadaaaaaeiaacaaaajaamaaaakaafaaaaad
+abaaabiaacaaffjaakaaffkaafaaaaadabaaaciaacaaffjaalaaffkaafaaaaad
+abaaaeiaacaaffjaamaaffkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaafaaaaad
+abaaabiaacaakkjaakaakkkaafaaaaadabaaaciaacaakkjaalaakkkaafaaaaad
+abaaaeiaacaakkjaamaakkkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaaiaaaaad
+aaaaaiiaaaaaoeiaaaaaoeiaahaaaaacaaaaaiiaaaaappiaafaaaaadabaaahoa
+aaaappiaaaaaoeiaafaaaaadaaaaapiaaaaaffjaadaaoekaaeaaaaaeaaaaapia
+acaaoekaaaaaaajaaaaaoeiaaeaaaaaeaaaaapiaaeaaoekaaaaakkjaaaaaoeia
+aeaaaaaeaaaaapiaafaaoekaaaaappjaaaaaoeiaaeaaaaaeaaaaadmaaaaappia
+aaaaoekaaaaaoeiaabaaaaacaaaaammaaaaaoeiappppaaaafdeieefcimadaaaa
+eaaaabaaodaaaaaafjaaaaaeegiocaaaaaaaaaaaapaaaaaafjaaaaaeegiocaaa
+abaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaa
+fpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaad
+dccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaa
+giaaaaacacaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaa
+abaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaabaaaaaaaaaaaaaa
+agbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaa
+abaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpccabaaa
+aaaaaaaaegiocaaaabaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaa
+dcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaaegiacaaaaaaaaaaaaoaaaaaa
+ogikcaaaaaaaaaaaaoaaaaaadiaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabaaaaaaadiaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabbaaaaaadiaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabcaaaaaadiaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaa
+egacbaaaabaaaaaadiaaaaaibcaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaa
+abaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaa
+eeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaadiaaaaahhccabaaaacaaaaaa
+pgapbaaaaaaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaa
+aaaaaaaaegiccaaaabaaaaaaanaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaa
+abaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaa
+aaaaaaaaegiccaaaabaaaaaaaoaaaaaakgbkbaaaaaaaaaaaegacbaaaaaaaaaaa
+dcaaaaakhccabaaaadaaaaaaegiccaaaabaaaaaaapaaaaaapgbpbaaaaaaaaaaa
+egacbaaaaaaaaaaadoaaaaabejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+adamaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaaheaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklkl"
+}
+SubProgram "d3d9 " {
+// Stats: 14 math
+Keywords { "DIRECTIONAL" }
+Bind "vertex" Vertex
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+Matrix 4 [_Object2World] 3
+Matrix 7 [_World2Object] 3
+Matrix 0 [glstate_matrix_mvp]
+Vector 10 [_MainTex_ST]
+"vs_2_0
+dcl_position v0
+dcl_normal v1
+dcl_texcoord v2
+dp4 oPos.x, c0, v0
+dp4 oPos.y, c1, v0
+dp4 oPos.z, c2, v0
+dp4 oPos.w, c3, v0
+mad oT0.xy, v2, c10, c10.zwzw
+dp4 oT2.x, c4, v0
+dp4 oT2.y, c5, v0
+dp4 oT2.z, c6, v0
+mul r0.xyz, v1.y, c8
+mad r0.xyz, c7, v1.x, r0
+mad r0.xyz, c9, v1.z, r0
+dp3 r0.w, r0, r0
+rsq r0.w, r0.w
+mul oT1.xyz, r0.w, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 23 math
+Keywords { "DIRECTIONAL" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 176
+Vector 160 [_MainTex_ST]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerDraw" 1
+"vs_4_0
+root12:aaacaaaa
+eefiecedjkapaphijibjblghmlnlloipfbhfmpnpabaaaaaaeaafaaaaadaaaaaa
+cmaaaaaaceabaaaakmabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+adamaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaaheaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklklfdeieefcimadaaaaeaaaabaaodaaaaaafjaaaaae
+egiocaaaaaaaaaaaalaaaaaafjaaaaaeegiocaaaabaaaaaabdaaaaaafpaaaaad
+pcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaafpaaaaaddcbabaaaadaaaaaa
+ghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaaddccabaaaabaaaaaagfaaaaad
+hccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaagiaaaaacacaaaaaadiaaaaai
+pcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaabaaaaaaabaaaaaadcaaaaak
+pcaabaaaaaaaaaaaegiocaaaabaaaaaaaaaaaaaaagbabaaaaaaaaaaaegaobaaa
+aaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaabaaaaaaacaaaaaakgbkbaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaakpccabaaaaaaaaaaaegiocaaaabaaaaaa
+adaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaa
+egbabaaaadaaaaaaegiacaaaaaaaaaaaakaaaaaaogikcaaaaaaaaaaaakaaaaaa
+diaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabaaaaaaa
+diaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabbaaaaaa
+diaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabcaaaaaa
+diaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabaaaaaaa
+diaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabbaaaaaa
+diaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabcaaaaaa
+aaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaai
+bcaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabaaaaaaadiaaaaai
+ccaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabbaaaaaadiaaaaai
+ecaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabcaaaaaaaaaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaa
+dkaabaaaaaaaaaaadiaaaaahhccabaaaacaaaaaapgapbaaaaaaaaaaaegacbaaa
+aaaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiccaaaabaaaaaa
+anaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaabaaaaaaamaaaaaaagbabaaa
+aaaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaabaaaaaa
+aoaaaaaakgbkbaaaaaaaaaaaegacbaaaaaaaaaaadcaaaaakhccabaaaadaaaaaa
+egiccaaaabaaaaaaapaaaaaapgbpbaaaaaaaaaaaegacbaaaaaaaaaaadoaaaaab
+"
+}
+SubProgram "d3d11_9x " {
+// Stats: 23 math
+Keywords { "DIRECTIONAL" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 176
+Vector 160 [_MainTex_ST]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerDraw" 1
+"vs_4_0_level_9_1
+root12:aaacaaaa
+eefiecednhmochkbpnefidoopnfiajlkpifdfhmcabaaaaaagmahaaaaaeaaaaaa
+daaaaaaafiacaaaaomafaaaaoeagaaaaebgpgodjcaacaaaacaacaaaaaaacpopp
+neabaaaaemaaaaaaadaaceaaaaaaeiaaaaaaeiaaaaaaceaaabaaeiaaaaaaakaa
+abaaabaaaaaaaaaaabaaaaaaaeaaacaaaaaaaaaaabaaamaaahaaagaaaaaaaaaa
+aaaaaaaaaaacpoppbpaaaaacafaaaaiaaaaaapjabpaaaaacafaaaciaacaaapja
+bpaaaaacafaaadiaadaaapjaaeaaaaaeaaaaadoaadaaoejaabaaoekaabaaooka
+afaaaaadaaaaahiaaaaaffjaahaaoekaaeaaaaaeaaaaahiaagaaoekaaaaaaaja
+aaaaoeiaaeaaaaaeaaaaahiaaiaaoekaaaaakkjaaaaaoeiaaeaaaaaeacaaahoa
+ajaaoekaaaaappjaaaaaoeiaafaaaaadaaaaabiaacaaaajaakaaaakaafaaaaad
+aaaaaciaacaaaajaalaaaakaafaaaaadaaaaaeiaacaaaajaamaaaakaafaaaaad
+abaaabiaacaaffjaakaaffkaafaaaaadabaaaciaacaaffjaalaaffkaafaaaaad
+abaaaeiaacaaffjaamaaffkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaafaaaaad
+abaaabiaacaakkjaakaakkkaafaaaaadabaaaciaacaakkjaalaakkkaafaaaaad
+abaaaeiaacaakkjaamaakkkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaaiaaaaad
+aaaaaiiaaaaaoeiaaaaaoeiaahaaaaacaaaaaiiaaaaappiaafaaaaadabaaahoa
+aaaappiaaaaaoeiaafaaaaadaaaaapiaaaaaffjaadaaoekaaeaaaaaeaaaaapia
+acaaoekaaaaaaajaaaaaoeiaaeaaaaaeaaaaapiaaeaaoekaaaaakkjaaaaaoeia
+aeaaaaaeaaaaapiaafaaoekaaaaappjaaaaaoeiaaeaaaaaeaaaaadmaaaaappia
+aaaaoekaaaaaoeiaabaaaaacaaaaammaaaaaoeiappppaaaafdeieefcimadaaaa
+eaaaabaaodaaaaaafjaaaaaeegiocaaaaaaaaaaaalaaaaaafjaaaaaeegiocaaa
+abaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaa
+fpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaad
+dccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaa
+giaaaaacacaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaa
+abaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaabaaaaaaaaaaaaaa
+agbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaa
+abaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpccabaaa
+aaaaaaaaegiocaaaabaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaa
+dcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaaegiacaaaaaaaaaaaakaaaaaa
+ogikcaaaaaaaaaaaakaaaaaadiaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabaaaaaaadiaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabbaaaaaadiaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabcaaaaaadiaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaa
+egacbaaaabaaaaaadiaaaaaibcaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaa
+abaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaa
+eeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaadiaaaaahhccabaaaacaaaaaa
+pgapbaaaaaaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaa
+aaaaaaaaegiccaaaabaaaaaaanaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaa
+abaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaa
+aaaaaaaaegiccaaaabaaaaaaaoaaaaaakgbkbaaaaaaaaaaaegacbaaaaaaaaaaa
+dcaaaaakhccabaaaadaaaaaaegiccaaaabaaaaaaapaaaaaapgbpbaaaaaaaaaaa
+egacbaaaaaaaaaaadoaaaaabejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+adamaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaaheaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklkl"
+}
+SubProgram "d3d9 " {
+// Stats: 14 math
+Keywords { "SPOT" }
+Bind "vertex" Vertex
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+Matrix 4 [_Object2World] 3
+Matrix 7 [_World2Object] 3
+Matrix 0 [glstate_matrix_mvp]
+Vector 10 [_MainTex_ST]
+"vs_2_0
+dcl_position v0
+dcl_normal v1
+dcl_texcoord v2
+dp4 oPos.x, c0, v0
+dp4 oPos.y, c1, v0
+dp4 oPos.z, c2, v0
+dp4 oPos.w, c3, v0
+mad oT0.xy, v2, c10, c10.zwzw
+dp4 oT2.x, c4, v0
+dp4 oT2.y, c5, v0
+dp4 oT2.z, c6, v0
+mul r0.xyz, v1.y, c8
+mad r0.xyz, c7, v1.x, r0
+mad r0.xyz, c9, v1.z, r0
+dp3 r0.w, r0, r0
+rsq r0.w, r0.w
+mul oT1.xyz, r0.w, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 23 math
+Keywords { "SPOT" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 240
+Vector 224 [_MainTex_ST]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerDraw" 1
+"vs_4_0
+root12:aaacaaaa
+eefiecednophaijpcjkhbcefiaooglnlhcpkdecaabaaaaaaeaafaaaaadaaaaaa
+cmaaaaaaceabaaaakmabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+adamaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaaheaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklklfdeieefcimadaaaaeaaaabaaodaaaaaafjaaaaae
+egiocaaaaaaaaaaaapaaaaaafjaaaaaeegiocaaaabaaaaaabdaaaaaafpaaaaad
+pcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaafpaaaaaddcbabaaaadaaaaaa
+ghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaaddccabaaaabaaaaaagfaaaaad
+hccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaagiaaaaacacaaaaaadiaaaaai
+pcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaabaaaaaaabaaaaaadcaaaaak
+pcaabaaaaaaaaaaaegiocaaaabaaaaaaaaaaaaaaagbabaaaaaaaaaaaegaobaaa
+aaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaabaaaaaaacaaaaaakgbkbaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaakpccabaaaaaaaaaaaegiocaaaabaaaaaa
+adaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaa
+egbabaaaadaaaaaaegiacaaaaaaaaaaaaoaaaaaaogikcaaaaaaaaaaaaoaaaaaa
+diaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabaaaaaaa
+diaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabbaaaaaa
+diaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabcaaaaaa
+diaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabaaaaaaa
+diaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabbaaaaaa
+diaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabcaaaaaa
+aaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaai
+bcaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabaaaaaaadiaaaaai
+ccaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabbaaaaaadiaaaaai
+ecaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabcaaaaaaaaaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaa
+dkaabaaaaaaaaaaadiaaaaahhccabaaaacaaaaaapgapbaaaaaaaaaaaegacbaaa
+aaaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiccaaaabaaaaaa
+anaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaabaaaaaaamaaaaaaagbabaaa
+aaaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaabaaaaaa
+aoaaaaaakgbkbaaaaaaaaaaaegacbaaaaaaaaaaadcaaaaakhccabaaaadaaaaaa
+egiccaaaabaaaaaaapaaaaaapgbpbaaaaaaaaaaaegacbaaaaaaaaaaadoaaaaab
+"
+}
+SubProgram "d3d11_9x " {
+// Stats: 23 math
+Keywords { "SPOT" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 240
+Vector 224 [_MainTex_ST]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerDraw" 1
+"vs_4_0_level_9_1
+root12:aaacaaaa
+eefiecedhllkjadkodggoogckccnphpoodpampkgabaaaaaagmahaaaaaeaaaaaa
+daaaaaaafiacaaaaomafaaaaoeagaaaaebgpgodjcaacaaaacaacaaaaaaacpopp
+neabaaaaemaaaaaaadaaceaaaaaaeiaaaaaaeiaaaaaaceaaabaaeiaaaaaaaoaa
+abaaabaaaaaaaaaaabaaaaaaaeaaacaaaaaaaaaaabaaamaaahaaagaaaaaaaaaa
+aaaaaaaaaaacpoppbpaaaaacafaaaaiaaaaaapjabpaaaaacafaaaciaacaaapja
+bpaaaaacafaaadiaadaaapjaaeaaaaaeaaaaadoaadaaoejaabaaoekaabaaooka
+afaaaaadaaaaahiaaaaaffjaahaaoekaaeaaaaaeaaaaahiaagaaoekaaaaaaaja
+aaaaoeiaaeaaaaaeaaaaahiaaiaaoekaaaaakkjaaaaaoeiaaeaaaaaeacaaahoa
+ajaaoekaaaaappjaaaaaoeiaafaaaaadaaaaabiaacaaaajaakaaaakaafaaaaad
+aaaaaciaacaaaajaalaaaakaafaaaaadaaaaaeiaacaaaajaamaaaakaafaaaaad
+abaaabiaacaaffjaakaaffkaafaaaaadabaaaciaacaaffjaalaaffkaafaaaaad
+abaaaeiaacaaffjaamaaffkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaafaaaaad
+abaaabiaacaakkjaakaakkkaafaaaaadabaaaciaacaakkjaalaakkkaafaaaaad
+abaaaeiaacaakkjaamaakkkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaaiaaaaad
+aaaaaiiaaaaaoeiaaaaaoeiaahaaaaacaaaaaiiaaaaappiaafaaaaadabaaahoa
+aaaappiaaaaaoeiaafaaaaadaaaaapiaaaaaffjaadaaoekaaeaaaaaeaaaaapia
+acaaoekaaaaaaajaaaaaoeiaaeaaaaaeaaaaapiaaeaaoekaaaaakkjaaaaaoeia
+aeaaaaaeaaaaapiaafaaoekaaaaappjaaaaaoeiaaeaaaaaeaaaaadmaaaaappia
+aaaaoekaaaaaoeiaabaaaaacaaaaammaaaaaoeiappppaaaafdeieefcimadaaaa
+eaaaabaaodaaaaaafjaaaaaeegiocaaaaaaaaaaaapaaaaaafjaaaaaeegiocaaa
+abaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaa
+fpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaad
+dccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaa
+giaaaaacacaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaa
+abaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaabaaaaaaaaaaaaaa
+agbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaa
+abaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpccabaaa
+aaaaaaaaegiocaaaabaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaa
+dcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaaegiacaaaaaaaaaaaaoaaaaaa
+ogikcaaaaaaaaaaaaoaaaaaadiaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabaaaaaaadiaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabbaaaaaadiaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabcaaaaaadiaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaa
+egacbaaaabaaaaaadiaaaaaibcaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaa
+abaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaa
+eeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaadiaaaaahhccabaaaacaaaaaa
+pgapbaaaaaaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaa
+aaaaaaaaegiccaaaabaaaaaaanaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaa
+abaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaa
+aaaaaaaaegiccaaaabaaaaaaaoaaaaaakgbkbaaaaaaaaaaaegacbaaaaaaaaaaa
+dcaaaaakhccabaaaadaaaaaaegiccaaaabaaaaaaapaaaaaapgbpbaaaaaaaaaaa
+egacbaaaaaaaaaaadoaaaaabejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+adamaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaaheaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklkl"
+}
+SubProgram "d3d9 " {
+// Stats: 14 math
+Keywords { "POINT_COOKIE" }
+Bind "vertex" Vertex
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+Matrix 4 [_Object2World] 3
+Matrix 7 [_World2Object] 3
+Matrix 0 [glstate_matrix_mvp]
+Vector 10 [_MainTex_ST]
+"vs_2_0
+dcl_position v0
+dcl_normal v1
+dcl_texcoord v2
+dp4 oPos.x, c0, v0
+dp4 oPos.y, c1, v0
+dp4 oPos.z, c2, v0
+dp4 oPos.w, c3, v0
+mad oT0.xy, v2, c10, c10.zwzw
+dp4 oT2.x, c4, v0
+dp4 oT2.y, c5, v0
+dp4 oT2.z, c6, v0
+mul r0.xyz, v1.y, c8
+mad r0.xyz, c7, v1.x, r0
+mad r0.xyz, c9, v1.z, r0
+dp3 r0.w, r0, r0
+rsq r0.w, r0.w
+mul oT1.xyz, r0.w, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 23 math
+Keywords { "POINT_COOKIE" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 240
+Vector 224 [_MainTex_ST]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerDraw" 1
+"vs_4_0
+root12:aaacaaaa
+eefiecednophaijpcjkhbcefiaooglnlhcpkdecaabaaaaaaeaafaaaaadaaaaaa
+cmaaaaaaceabaaaakmabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+adamaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaaheaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklklfdeieefcimadaaaaeaaaabaaodaaaaaafjaaaaae
+egiocaaaaaaaaaaaapaaaaaafjaaaaaeegiocaaaabaaaaaabdaaaaaafpaaaaad
+pcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaafpaaaaaddcbabaaaadaaaaaa
+ghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaaddccabaaaabaaaaaagfaaaaad
+hccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaagiaaaaacacaaaaaadiaaaaai
+pcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaabaaaaaaabaaaaaadcaaaaak
+pcaabaaaaaaaaaaaegiocaaaabaaaaaaaaaaaaaaagbabaaaaaaaaaaaegaobaaa
+aaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaabaaaaaaacaaaaaakgbkbaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaakpccabaaaaaaaaaaaegiocaaaabaaaaaa
+adaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaa
+egbabaaaadaaaaaaegiacaaaaaaaaaaaaoaaaaaaogikcaaaaaaaaaaaaoaaaaaa
+diaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabaaaaaaa
+diaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabbaaaaaa
+diaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabcaaaaaa
+diaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabaaaaaaa
+diaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabbaaaaaa
+diaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabcaaaaaa
+aaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaai
+bcaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabaaaaaaadiaaaaai
+ccaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabbaaaaaadiaaaaai
+ecaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabcaaaaaaaaaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaa
+dkaabaaaaaaaaaaadiaaaaahhccabaaaacaaaaaapgapbaaaaaaaaaaaegacbaaa
+aaaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiccaaaabaaaaaa
+anaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaabaaaaaaamaaaaaaagbabaaa
+aaaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaabaaaaaa
+aoaaaaaakgbkbaaaaaaaaaaaegacbaaaaaaaaaaadcaaaaakhccabaaaadaaaaaa
+egiccaaaabaaaaaaapaaaaaapgbpbaaaaaaaaaaaegacbaaaaaaaaaaadoaaaaab
+"
+}
+SubProgram "d3d11_9x " {
+// Stats: 23 math
+Keywords { "POINT_COOKIE" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 240
+Vector 224 [_MainTex_ST]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerDraw" 1
+"vs_4_0_level_9_1
+root12:aaacaaaa
+eefiecedhllkjadkodggoogckccnphpoodpampkgabaaaaaagmahaaaaaeaaaaaa
+daaaaaaafiacaaaaomafaaaaoeagaaaaebgpgodjcaacaaaacaacaaaaaaacpopp
+neabaaaaemaaaaaaadaaceaaaaaaeiaaaaaaeiaaaaaaceaaabaaeiaaaaaaaoaa
+abaaabaaaaaaaaaaabaaaaaaaeaaacaaaaaaaaaaabaaamaaahaaagaaaaaaaaaa
+aaaaaaaaaaacpoppbpaaaaacafaaaaiaaaaaapjabpaaaaacafaaaciaacaaapja
+bpaaaaacafaaadiaadaaapjaaeaaaaaeaaaaadoaadaaoejaabaaoekaabaaooka
+afaaaaadaaaaahiaaaaaffjaahaaoekaaeaaaaaeaaaaahiaagaaoekaaaaaaaja
+aaaaoeiaaeaaaaaeaaaaahiaaiaaoekaaaaakkjaaaaaoeiaaeaaaaaeacaaahoa
+ajaaoekaaaaappjaaaaaoeiaafaaaaadaaaaabiaacaaaajaakaaaakaafaaaaad
+aaaaaciaacaaaajaalaaaakaafaaaaadaaaaaeiaacaaaajaamaaaakaafaaaaad
+abaaabiaacaaffjaakaaffkaafaaaaadabaaaciaacaaffjaalaaffkaafaaaaad
+abaaaeiaacaaffjaamaaffkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaafaaaaad
+abaaabiaacaakkjaakaakkkaafaaaaadabaaaciaacaakkjaalaakkkaafaaaaad
+abaaaeiaacaakkjaamaakkkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaaiaaaaad
+aaaaaiiaaaaaoeiaaaaaoeiaahaaaaacaaaaaiiaaaaappiaafaaaaadabaaahoa
+aaaappiaaaaaoeiaafaaaaadaaaaapiaaaaaffjaadaaoekaaeaaaaaeaaaaapia
+acaaoekaaaaaaajaaaaaoeiaaeaaaaaeaaaaapiaaeaaoekaaaaakkjaaaaaoeia
+aeaaaaaeaaaaapiaafaaoekaaaaappjaaaaaoeiaaeaaaaaeaaaaadmaaaaappia
+aaaaoekaaaaaoeiaabaaaaacaaaaammaaaaaoeiappppaaaafdeieefcimadaaaa
+eaaaabaaodaaaaaafjaaaaaeegiocaaaaaaaaaaaapaaaaaafjaaaaaeegiocaaa
+abaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaa
+fpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaad
+dccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaa
+giaaaaacacaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaa
+abaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaabaaaaaaaaaaaaaa
+agbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaa
+abaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpccabaaa
+aaaaaaaaegiocaaaabaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaa
+dcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaaegiacaaaaaaaaaaaaoaaaaaa
+ogikcaaaaaaaaaaaaoaaaaaadiaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabaaaaaaadiaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabbaaaaaadiaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabcaaaaaadiaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaa
+egacbaaaabaaaaaadiaaaaaibcaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaa
+abaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaa
+eeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaadiaaaaahhccabaaaacaaaaaa
+pgapbaaaaaaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaa
+aaaaaaaaegiccaaaabaaaaaaanaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaa
+abaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaa
+aaaaaaaaegiccaaaabaaaaaaaoaaaaaakgbkbaaaaaaaaaaaegacbaaaaaaaaaaa
+dcaaaaakhccabaaaadaaaaaaegiccaaaabaaaaaaapaaaaaapgbpbaaaaaaaaaaa
+egacbaaaaaaaaaaadoaaaaabejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+adamaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaaheaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklkl"
+}
+SubProgram "d3d9 " {
+// Stats: 14 math
+Keywords { "DIRECTIONAL_COOKIE" }
+Bind "vertex" Vertex
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+Matrix 4 [_Object2World] 3
+Matrix 7 [_World2Object] 3
+Matrix 0 [glstate_matrix_mvp]
+Vector 10 [_MainTex_ST]
+"vs_2_0
+dcl_position v0
+dcl_normal v1
+dcl_texcoord v2
+dp4 oPos.x, c0, v0
+dp4 oPos.y, c1, v0
+dp4 oPos.z, c2, v0
+dp4 oPos.w, c3, v0
+mad oT0.xy, v2, c10, c10.zwzw
+dp4 oT2.x, c4, v0
+dp4 oT2.y, c5, v0
+dp4 oT2.z, c6, v0
+mul r0.xyz, v1.y, c8
+mad r0.xyz, c7, v1.x, r0
+mad r0.xyz, c9, v1.z, r0
+dp3 r0.w, r0, r0
+rsq r0.w, r0.w
+mul oT1.xyz, r0.w, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 23 math
+Keywords { "DIRECTIONAL_COOKIE" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 240
+Vector 224 [_MainTex_ST]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerDraw" 1
+"vs_4_0
+root12:aaacaaaa
+eefiecednophaijpcjkhbcefiaooglnlhcpkdecaabaaaaaaeaafaaaaadaaaaaa
+cmaaaaaaceabaaaakmabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+adamaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaaheaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklklfdeieefcimadaaaaeaaaabaaodaaaaaafjaaaaae
+egiocaaaaaaaaaaaapaaaaaafjaaaaaeegiocaaaabaaaaaabdaaaaaafpaaaaad
+pcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaafpaaaaaddcbabaaaadaaaaaa
+ghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaaddccabaaaabaaaaaagfaaaaad
+hccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaagiaaaaacacaaaaaadiaaaaai
+pcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaabaaaaaaabaaaaaadcaaaaak
+pcaabaaaaaaaaaaaegiocaaaabaaaaaaaaaaaaaaagbabaaaaaaaaaaaegaobaaa
+aaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaabaaaaaaacaaaaaakgbkbaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaakpccabaaaaaaaaaaaegiocaaaabaaaaaa
+adaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaa
+egbabaaaadaaaaaaegiacaaaaaaaaaaaaoaaaaaaogikcaaaaaaaaaaaaoaaaaaa
+diaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabaaaaaaa
+diaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabbaaaaaa
+diaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaabaaaaaabcaaaaaa
+diaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabaaaaaaa
+diaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabbaaaaaa
+diaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaabaaaaaabcaaaaaa
+aaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaai
+bcaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabaaaaaaadiaaaaai
+ccaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabbaaaaaadiaaaaai
+ecaabaaaabaaaaaackbabaaaacaaaaaackiacaaaabaaaaaabcaaaaaaaaaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaa
+dkaabaaaaaaaaaaadiaaaaahhccabaaaacaaaaaapgapbaaaaaaaaaaaegacbaaa
+aaaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiccaaaabaaaaaa
+anaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaabaaaaaaamaaaaaaagbabaaa
+aaaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaabaaaaaa
+aoaaaaaakgbkbaaaaaaaaaaaegacbaaaaaaaaaaadcaaaaakhccabaaaadaaaaaa
+egiccaaaabaaaaaaapaaaaaapgbpbaaaaaaaaaaaegacbaaaaaaaaaaadoaaaaab
+"
+}
+SubProgram "d3d11_9x " {
+// Stats: 23 math
+Keywords { "DIRECTIONAL_COOKIE" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 240
+Vector 224 [_MainTex_ST]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerDraw" 1
+"vs_4_0_level_9_1
+root12:aaacaaaa
+eefiecedhllkjadkodggoogckccnphpoodpampkgabaaaaaagmahaaaaaeaaaaaa
+daaaaaaafiacaaaaomafaaaaoeagaaaaebgpgodjcaacaaaacaacaaaaaaacpopp
+neabaaaaemaaaaaaadaaceaaaaaaeiaaaaaaeiaaaaaaceaaabaaeiaaaaaaaoaa
+abaaabaaaaaaaaaaabaaaaaaaeaaacaaaaaaaaaaabaaamaaahaaagaaaaaaaaaa
+aaaaaaaaaaacpoppbpaaaaacafaaaaiaaaaaapjabpaaaaacafaaaciaacaaapja
+bpaaaaacafaaadiaadaaapjaaeaaaaaeaaaaadoaadaaoejaabaaoekaabaaooka
+afaaaaadaaaaahiaaaaaffjaahaaoekaaeaaaaaeaaaaahiaagaaoekaaaaaaaja
+aaaaoeiaaeaaaaaeaaaaahiaaiaaoekaaaaakkjaaaaaoeiaaeaaaaaeacaaahoa
+ajaaoekaaaaappjaaaaaoeiaafaaaaadaaaaabiaacaaaajaakaaaakaafaaaaad
+aaaaaciaacaaaajaalaaaakaafaaaaadaaaaaeiaacaaaajaamaaaakaafaaaaad
+abaaabiaacaaffjaakaaffkaafaaaaadabaaaciaacaaffjaalaaffkaafaaaaad
+abaaaeiaacaaffjaamaaffkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaafaaaaad
+abaaabiaacaakkjaakaakkkaafaaaaadabaaaciaacaakkjaalaakkkaafaaaaad
+abaaaeiaacaakkjaamaakkkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaaiaaaaad
+aaaaaiiaaaaaoeiaaaaaoeiaahaaaaacaaaaaiiaaaaappiaafaaaaadabaaahoa
+aaaappiaaaaaoeiaafaaaaadaaaaapiaaaaaffjaadaaoekaaeaaaaaeaaaaapia
+acaaoekaaaaaaajaaaaaoeiaaeaaaaaeaaaaapiaaeaaoekaaaaakkjaaaaaoeia
+aeaaaaaeaaaaapiaafaaoekaaaaappjaaaaaoeiaaeaaaaaeaaaaadmaaaaappia
+aaaaoekaaaaaoeiaabaaaaacaaaaammaaaaaoeiappppaaaafdeieefcimadaaaa
+eaaaabaaodaaaaaafjaaaaaeegiocaaaaaaaaaaaapaaaaaafjaaaaaeegiocaaa
+abaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaa
+fpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaad
+dccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaa
+giaaaaacacaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaa
+abaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaabaaaaaaaaaaaaaa
+agbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaa
+abaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpccabaaa
+aaaaaaaaegiocaaaabaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaa
+dcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaaegiacaaaaaaaaaaaaoaaaaaa
+ogikcaaaaaaaaaaaaoaaaaaadiaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabaaaaaaadiaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabbaaaaaadiaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaabaaaaaabcaaaaaadiaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaabaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaa
+egacbaaaabaaaaaadiaaaaaibcaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+abaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaa
+abaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaa
+eeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaadiaaaaahhccabaaaacaaaaaa
+pgapbaaaaaaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaa
+aaaaaaaaegiccaaaabaaaaaaanaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaa
+abaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaa
+aaaaaaaaegiccaaaabaaaaaaaoaaaaaakgbkbaaaaaaaaaaaegacbaaaaaaaaaaa
+dcaaaaakhccabaaaadaaaaaaegiccaaaabaaaaaaapaaaaaapgbpbaaaaaaaaaaa
+egacbaaaaaaaaaaadoaaaaabejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+adamaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaaheaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklkl"
+}
+}
+Program "fp" {
+SubProgram "d3d9 " {
+// Stats: 18 math, 2 textures
+Keywords { "POINT" }
+Matrix 0 [_LightMatrix0] 3
+Vector 5 [_Color]
+Vector 4 [_LightColor0]
+Vector 3 [_WorldSpaceLightPos0]
+SetTexture 0 [_LightTexture0] 2D 0
+SetTexture 1 [_MainTex] 2D 1
+"ps_2_0
+def c6, 1, 0, 0, 0
+dcl t0.xy
+dcl_pp t1.xyz
+dcl t2.xyz
+dcl_2d s0
+dcl_2d s1
+mov r0.xyz, t2
+mov_pp r0.w, c6.x
+dp4 r1.x, c0, r0
+dp4 r1.y, c1, r0
+dp4 r1.z, c2, r0
+dp3 r0.xy, r1, r1
+texld_pp r0, r0, s0
+texld_pp r1, t0, s1
+mul_pp r0.xyz, r0.x, c4
+mul_pp r1.xyz, r1, c5
+mul_pp r0.xyz, r0, r1
+add r1.xyz, -t2, c3
+nrm_pp r2.xyz, r1
+dp3_pp r0.w, t1, r2
+max_pp r1.x, r0.w, c6.y
+mul_pp r0.xyz, r0, r1.x
+mov_pp r0.w, c6.x
+mov_pp oC0, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 15 math, 2 textures
+Keywords { "POINT" }
+SetTexture 0 [_MainTex] 2D 1
+SetTexture 1 [_LightTexture0] 2D 0
+ConstBuffer "$Globals" 240
+Matrix 144 [_LightMatrix0]
+Vector 96 [_LightColor0]
+Vector 208 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+"ps_4_0
+root12:acacacaa
+eefieceddjmgbhefongecikidfolkbmjjllabaagabaaaaaaleadaaaaadaaaaaa
+cmaaaaaaleaaaaaaoiaaaaaaejfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaadadaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaheaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahahaaaafdfgfpfa
+epfdejfeejepeoaafeeffiedepepfceeaaklklklepfdeheocmaaaaaaabaaaaaa
+aiaaaaaacaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapaaaaaafdfgfpfe
+gbhcghgfheaaklklfdeieefcmeacaaaaeaaaaaaalbaaaaaafjaaaaaeegiocaaa
+aaaaaaaaaoaaaaaafjaaaaaeegiocaaaabaaaaaaabaaaaaafkaaaaadaagabaaa
+aaaaaaaafkaaaaadaagabaaaabaaaaaafibiaaaeaahabaaaaaaaaaaaffffaaaa
+fibiaaaeaahabaaaabaaaaaaffffaaaagcbaaaaddcbabaaaabaaaaaagcbaaaad
+hcbabaaaacaaaaaagcbaaaadhcbabaaaadaaaaaagfaaaaadpccabaaaaaaaaaaa
+giaaaaacacaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaaadaaaaaaegiccaaa
+aaaaaaaaakaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaaaaaaaaaajaaaaaa
+agbabaaaadaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaa
+aaaaaaaaalaaaaaakgbkbaaaadaaaaaaegacbaaaaaaaaaaaaaaaaaaihcaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegiccaaaaaaaaaaaamaaaaaabaaaaaahbcaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaefaaaaajpcaabaaaaaaaaaaa
+agaabaaaaaaaaaaaeghobaaaabaaaaaaaagabaaaaaaaaaaadiaaaaaihcaabaaa
+aaaaaaaaagaabaaaaaaaaaaaegiccaaaaaaaaaaaagaaaaaaefaaaaajpcaabaaa
+abaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaaabaaaaaadiaaaaai
+hcaabaaaabaaaaaaegacbaaaabaaaaaaegiccaaaaaaaaaaaanaaaaaadiaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaaaaaaaaajhcaabaaa
+abaaaaaaegbcbaiaebaaaaaaadaaaaaaegiccaaaabaaaaaaaaaaaaaabaaaaaah
+icaabaaaaaaaaaaaegacbaaaabaaaaaaegacbaaaabaaaaaaeeaaaaaficaabaaa
+aaaaaaaadkaabaaaaaaaaaaadiaaaaahhcaabaaaabaaaaaapgapbaaaaaaaaaaa
+egacbaaaabaaaaaabaaaaaahicaabaaaaaaaaaaaegbcbaaaacaaaaaaegacbaaa
+abaaaaaadeaaaaahicaabaaaaaaaaaaadkaabaaaaaaaaaaaabeaaaaaaaaaaaaa
+diaaaaahhccabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadgaaaaaf
+iccabaaaaaaaaaaaabeaaaaaaaaaiadpdoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 15 math, 2 textures
+Keywords { "POINT" }
+SetTexture 0 [_MainTex] 2D 1
+SetTexture 1 [_LightTexture0] 2D 0
+ConstBuffer "$Globals" 240
+Matrix 144 [_LightMatrix0]
+Vector 96 [_LightColor0]
+Vector 208 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+"ps_4_0_level_9_1
+root12:acacacaa
+eefiecedodcjmnkpbfjfdjdljdddhclhlnbehkpmabaaaaaahiafaaaaaeaaaaaa
+daaaaaaapaabaaaalmaeaaaaeeafaaaaebgpgodjliabaaaaliabaaaaaaacpppp
+giabaaaafaaaaaaaadaacmaaaaaafaaaaaaafaaaacaaceaaaaaafaaaabaaaaaa
+aaababaaaaaaagaaabaaaaaaaaaaaaaaaaaaajaaafaaabaaaaaaaaaaabaaaaaa
+abaaagaaaaaaaaaaaaacppppfbaaaaafahaaapkaaaaaaaaaaaaaiadpaaaaaaaa
+aaaaaaaabpaaaaacaaaaaaiaaaaaahlabpaaaaacaaaaaaiaabaachlabpaaaaac
+aaaaaaiaacaaahlabpaaaaacaaaaaajaaaaiapkabpaaaaacaaaaaajaabaiapka
+afaaaaadaaaachiaacaafflaacaaoekaaeaaaaaeaaaachiaabaaoekaacaaaala
+aaaaoeiaaeaaaaaeaaaachiaadaaoekaacaakklaaaaaoeiaacaaaaadaaaaahia
+aaaaoeiaaeaaoekaaiaaaaadaaaaadiaaaaaoeiaaaaaoeiaecaaaaadaaaacpia
+aaaaoeiaaaaioekaecaaaaadabaacpiaaaaaoelaabaioekaafaaaaadaaaachia
+aaaaaaiaaaaaoekaafaaaaadabaachiaabaaoeiaafaaoekaafaaaaadaaaachia
+aaaaoeiaabaaoeiaacaaaaadabaaahiaacaaoelbagaaoekaceaaaaacacaachia
+abaaoeiaaiaaaaadaaaaciiaabaaoelaacaaoeiaalaaaaadabaacbiaaaaappia
+ahaaaakaafaaaaadaaaachiaaaaaoeiaabaaaaiaabaaaaacaaaaciiaahaaffka
+abaaaaacaaaicpiaaaaaoeiappppaaaafdeieefcmeacaaaaeaaaaaaalbaaaaaa
+fjaaaaaeegiocaaaaaaaaaaaaoaaaaaafjaaaaaeegiocaaaabaaaaaaabaaaaaa
+fkaaaaadaagabaaaaaaaaaaafkaaaaadaagabaaaabaaaaaafibiaaaeaahabaaa
+aaaaaaaaffffaaaafibiaaaeaahabaaaabaaaaaaffffaaaagcbaaaaddcbabaaa
+abaaaaaagcbaaaadhcbabaaaacaaaaaagcbaaaadhcbabaaaadaaaaaagfaaaaad
+pccabaaaaaaaaaaagiaaaaacacaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaa
+adaaaaaaegiccaaaaaaaaaaaakaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaa
+aaaaaaaaajaaaaaaagbabaaaadaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaa
+aaaaaaaaegiccaaaaaaaaaaaalaaaaaakgbkbaaaadaaaaaaegacbaaaaaaaaaaa
+aaaaaaaihcaabaaaaaaaaaaaegacbaaaaaaaaaaaegiccaaaaaaaaaaaamaaaaaa
+baaaaaahbcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaefaaaaaj
+pcaabaaaaaaaaaaaagaabaaaaaaaaaaaeghobaaaabaaaaaaaagabaaaaaaaaaaa
+diaaaaaihcaabaaaaaaaaaaaagaabaaaaaaaaaaaegiccaaaaaaaaaaaagaaaaaa
+efaaaaajpcaabaaaabaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaa
+abaaaaaadiaaaaaihcaabaaaabaaaaaaegacbaaaabaaaaaaegiccaaaaaaaaaaa
+anaaaaaadiaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaa
+aaaaaaajhcaabaaaabaaaaaaegbcbaiaebaaaaaaadaaaaaaegiccaaaabaaaaaa
+aaaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaaabaaaaaaegacbaaaabaaaaaa
+eeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaadiaaaaahhcaabaaaabaaaaaa
+pgapbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaaaaaaaaaaegbcbaaa
+acaaaaaaegacbaaaabaaaaaadeaaaaahicaabaaaaaaaaaaadkaabaaaaaaaaaaa
+abeaaaaaaaaaaaaadiaaaaahhccabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaa
+aaaaaaaadgaaaaaficcabaaaaaaaaaaaabeaaaaaaaaaiadpdoaaaaabejfdeheo
+iaaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaaabaaaaaaadaaaaaaaaaaaaaa
+apaaaaaaheaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaaadadaaaaheaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaacaaaaaaahahaaaaheaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaadaaaaaaahahaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfcee
+aaklklklepfdeheocmaaaaaaabaaaaaaaiaaaaaacaaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaaaaaaaaaapaaaaaafdfgfpfegbhcghgfheaaklkl"
+}
+SubProgram "d3d9 " {
+// Stats: 7 math, 1 textures
+Keywords { "DIRECTIONAL" }
+Vector 2 [_Color]
+Vector 1 [_LightColor0]
+Vector 0 [_WorldSpaceLightPos0]
+SetTexture 0 [_MainTex] 2D 0
+"ps_2_0
+def c3, 0, 1, 0, 0
+dcl t0.xy
+dcl_pp t1.xyz
+dcl_2d s0
+texld_pp r0, t0, s0
+mul_pp r0.xyz, r0, c2
+mul_pp r0.xyz, r0, c1
+dp3_pp r0.w, t1, c0
+max_pp r1.w, r0.w, c3.x
+mul_pp r0.xyz, r0, r1.w
+mov_pp r0.w, c3.y
+mov_pp oC0, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 5 math, 1 textures
+Keywords { "DIRECTIONAL" }
+SetTexture 0 [_MainTex] 2D 0
+ConstBuffer "$Globals" 176
+Vector 96 [_LightColor0]
+Vector 144 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+"ps_4_0
+root12:abacabaa
+eefiecedfcoflngecmmhckhopeljeciifnhnnjieabaaaaaadeacaaaaadaaaaaa
+cmaaaaaaleaaaaaaoiaaaaaaejfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaadadaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaheaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaaaaaafdfgfpfa
+epfdejfeejepeoaafeeffiedepepfceeaaklklklepfdeheocmaaaaaaabaaaaaa
+aiaaaaaacaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapaaaaaafdfgfpfe
+gbhcghgfheaaklklfdeieefceeabaaaaeaaaaaaafbaaaaaafjaaaaaeegiocaaa
+aaaaaaaaakaaaaaafjaaaaaeegiocaaaabaaaaaaabaaaaaafkaaaaadaagabaaa
+aaaaaaaafibiaaaeaahabaaaaaaaaaaaffffaaaagcbaaaaddcbabaaaabaaaaaa
+gcbaaaadhcbabaaaacaaaaaagfaaaaadpccabaaaaaaaaaaagiaaaaacabaaaaaa
+efaaaaajpcaabaaaaaaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaa
+aaaaaaaadiaaaaaihcaabaaaaaaaaaaaegacbaaaaaaaaaaaegiccaaaaaaaaaaa
+ajaaaaaadiaaaaaihcaabaaaaaaaaaaaegacbaaaaaaaaaaaegiccaaaaaaaaaaa
+agaaaaaabaaaaaaiicaabaaaaaaaaaaaegbcbaaaacaaaaaaegiccaaaabaaaaaa
+aaaaaaaadeaaaaahicaabaaaaaaaaaaadkaabaaaaaaaaaaaabeaaaaaaaaaaaaa
+diaaaaahhccabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadgaaaaaf
+iccabaaaaaaaaaaaabeaaaaaaaaaiadpdoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 5 math, 1 textures
+Keywords { "DIRECTIONAL" }
+SetTexture 0 [_MainTex] 2D 0
+ConstBuffer "$Globals" 176
+Vector 96 [_LightColor0]
+Vector 144 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+"ps_4_0_level_9_1
+root12:abacabaa
+eefiecedmofpihnfbgdkjjgllifecalaoenminanabaaaaaaeiadaaaaaeaaaaaa
+daaaaaaaeaabaaaaimacaaaabeadaaaaebgpgodjaiabaaaaaiabaaaaaaacpppp
+lmaaaaaaemaaaaaaadaaciaaaaaaemaaaaaaemaaabaaceaaaaaaemaaaaaaaaaa
+aaaaagaaabaaaaaaaaaaaaaaaaaaajaaabaaabaaaaaaaaaaabaaaaaaabaaacaa
+aaaaaaaaaaacppppfbaaaaafadaaapkaaaaaaaaaaaaaiadpaaaaaaaaaaaaaaaa
+bpaaaaacaaaaaaiaaaaaadlabpaaaaacaaaaaaiaabaachlabpaaaaacaaaaaaja
+aaaiapkaecaaaaadaaaacpiaaaaaoelaaaaioekaafaaaaadaaaachiaaaaaoeia
+abaaoekaafaaaaadaaaachiaaaaaoeiaaaaaoekaaiaaaaadaaaaciiaabaaoela
+acaaoekaalaaaaadabaaciiaaaaappiaadaaaakaafaaaaadaaaachiaaaaaoeia
+abaappiaabaaaaacaaaaciiaadaaffkaabaaaaacaaaicpiaaaaaoeiappppaaaa
+fdeieefceeabaaaaeaaaaaaafbaaaaaafjaaaaaeegiocaaaaaaaaaaaakaaaaaa
+fjaaaaaeegiocaaaabaaaaaaabaaaaaafkaaaaadaagabaaaaaaaaaaafibiaaae
+aahabaaaaaaaaaaaffffaaaagcbaaaaddcbabaaaabaaaaaagcbaaaadhcbabaaa
+acaaaaaagfaaaaadpccabaaaaaaaaaaagiaaaaacabaaaaaaefaaaaajpcaabaaa
+aaaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaaaaaaaaaadiaaaaai
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegiccaaaaaaaaaaaajaaaaaadiaaaaai
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegiccaaaaaaaaaaaagaaaaaabaaaaaai
+icaabaaaaaaaaaaaegbcbaaaacaaaaaaegiccaaaabaaaaaaaaaaaaaadeaaaaah
+icaabaaaaaaaaaaadkaabaaaaaaaaaaaabeaaaaaaaaaaaaadiaaaaahhccabaaa
+aaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadgaaaaaficcabaaaaaaaaaaa
+abeaaaaaaaaaiadpdoaaaaabejfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaadadaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaheaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaaaaaafdfgfpfa
+epfdejfeejepeoaafeeffiedepepfceeaaklklklepfdeheocmaaaaaaabaaaaaa
+aiaaaaaacaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapaaaaaafdfgfpfe
+gbhcghgfheaaklkl"
+}
+SubProgram "d3d9 " {
+// Stats: 23 math, 3 textures
+Keywords { "SPOT" }
+Matrix 0 [_LightMatrix0]
+Vector 6 [_Color]
+Vector 5 [_LightColor0]
+Vector 4 [_WorldSpaceLightPos0]
+SetTexture 0 [_LightTexture0] 2D 0
+SetTexture 1 [_LightTextureB0] 2D 1
+SetTexture 2 [_MainTex] 2D 2
+"ps_2_0
+def c7, 1, 0.5, 0, 0
+dcl t0.xy
+dcl_pp t1.xyz
+dcl t2.xyz
+dcl_2d s0
+dcl_2d s1
+dcl_2d s2
+mov r0.xyz, t2
+mov_pp r0.w, c7.x
+dp4_pp r1.x, c0, r0
+dp4_pp r1.y, c1, r0
+dp4_pp r1.z, c2, r0
+dp4_pp r1.w, c3, r0
+rcp r1.w, r1.w
+mad_pp r0.xy, r1, r1.w, c7.y
+dp3 r1.xy, r1, r1
+texld_pp r0, r0, s0
+texld_pp r2, r1, s1
+texld_pp r3, t0, s2
+mul r3.w, r0.w, r2.x
+mul_pp r0.xyz, r3.w, c5
+cmp_pp r0.xyz, -r1.z, c7.z, r0
+mul_pp r1.xyz, r3, c6
+mul_pp r0.xyz, r0, r1
+add r1.xyz, -t2, c4
+nrm_pp r2.xyz, r1
+dp3_pp r0.w, t1, r2
+max_pp r1.x, r0.w, c7.z
+mul_pp r0.xyz, r0, r1.x
+mov_pp r0.w, c7.x
+mov_pp oC0, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 21 math, 3 textures
+Keywords { "SPOT" }
+SetTexture 0 [_MainTex] 2D 2
+SetTexture 1 [_LightTexture0] 2D 0
+SetTexture 2 [_LightTextureB0] 2D 1
+ConstBuffer "$Globals" 240
+Matrix 144 [_LightMatrix0]
+Vector 96 [_LightColor0]
+Vector 208 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+"ps_4_0
+root12:adacadaa
+eefiecedigljcjaoneinopkaejcmbjiamhhmddcdabaaaaaakiaeaaaaadaaaaaa
+cmaaaaaaleaaaaaaoiaaaaaaejfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaadadaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaheaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahahaaaafdfgfpfa
+epfdejfeejepeoaafeeffiedepepfceeaaklklklepfdeheocmaaaaaaabaaaaaa
+aiaaaaaacaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapaaaaaafdfgfpfe
+gbhcghgfheaaklklfdeieefcliadaaaaeaaaaaaaooaaaaaafjaaaaaeegiocaaa
+aaaaaaaaaoaaaaaafjaaaaaeegiocaaaabaaaaaaabaaaaaafkaaaaadaagabaaa
+aaaaaaaafkaaaaadaagabaaaabaaaaaafkaaaaadaagabaaaacaaaaaafibiaaae
+aahabaaaaaaaaaaaffffaaaafibiaaaeaahabaaaabaaaaaaffffaaaafibiaaae
+aahabaaaacaaaaaaffffaaaagcbaaaaddcbabaaaabaaaaaagcbaaaadhcbabaaa
+acaaaaaagcbaaaadhcbabaaaadaaaaaagfaaaaadpccabaaaaaaaaaaagiaaaaac
+adaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaadaaaaaaegiocaaaaaaaaaaa
+akaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaaaaaaaaaajaaaaaaagbabaaa
+adaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaaaaaaaaa
+alaaaaaakgbkbaaaadaaaaaaegaobaaaaaaaaaaaaaaaaaaipcaabaaaaaaaaaaa
+egaobaaaaaaaaaaaegiocaaaaaaaaaaaamaaaaaaaoaaaaahdcaabaaaabaaaaaa
+egaabaaaaaaaaaaapgapbaaaaaaaaaaaaaaaaaakdcaabaaaabaaaaaaegaabaaa
+abaaaaaaaceaaaaaaaaaaadpaaaaaadpaaaaaaaaaaaaaaaaefaaaaajpcaabaaa
+abaaaaaaegaabaaaabaaaaaaeghobaaaabaaaaaaaagabaaaaaaaaaaadbaaaaah
+icaabaaaaaaaaaaaabeaaaaaaaaaaaaackaabaaaaaaaaaaabaaaaaahbcaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaefaaaaajpcaabaaaacaaaaaa
+agaabaaaaaaaaaaaeghobaaaacaaaaaaaagabaaaabaaaaaaabaaaaahbcaabaaa
+aaaaaaaadkaabaaaaaaaaaaaabeaaaaaaaaaiadpdiaaaaahbcaabaaaaaaaaaaa
+dkaabaaaabaaaaaaakaabaaaaaaaaaaadiaaaaahbcaabaaaaaaaaaaaakaabaaa
+acaaaaaaakaabaaaaaaaaaaadiaaaaaihcaabaaaaaaaaaaaagaabaaaaaaaaaaa
+egiccaaaaaaaaaaaagaaaaaaefaaaaajpcaabaaaabaaaaaaegbabaaaabaaaaaa
+eghobaaaaaaaaaaaaagabaaaacaaaaaadiaaaaaihcaabaaaabaaaaaaegacbaaa
+abaaaaaaegiccaaaaaaaaaaaanaaaaaadiaaaaahhcaabaaaaaaaaaaaegacbaaa
+aaaaaaaaegacbaaaabaaaaaaaaaaaaajhcaabaaaabaaaaaaegbcbaiaebaaaaaa
+adaaaaaaegiccaaaabaaaaaaaaaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaa
+abaaaaaaegacbaaaabaaaaaaeeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaa
+diaaaaahhcaabaaaabaaaaaapgapbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaah
+icaabaaaaaaaaaaaegbcbaaaacaaaaaaegacbaaaabaaaaaadeaaaaahicaabaaa
+aaaaaaaadkaabaaaaaaaaaaaabeaaaaaaaaaaaaadiaaaaahhccabaaaaaaaaaaa
+pgapbaaaaaaaaaaaegacbaaaaaaaaaaadgaaaaaficcabaaaaaaaaaaaabeaaaaa
+aaaaiadpdoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 21 math, 3 textures
+Keywords { "SPOT" }
+SetTexture 0 [_MainTex] 2D 2
+SetTexture 1 [_LightTexture0] 2D 0
+SetTexture 2 [_LightTextureB0] 2D 1
+ConstBuffer "$Globals" 240
+Matrix 144 [_LightMatrix0]
+Vector 96 [_LightColor0]
+Vector 208 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+"ps_4_0_level_9_1
+root12:adacadaa
+eefiecednfkcaiblpkfofhgcmhpbdnngojkbcpjpabaaaaaanaagaaaaaeaaaaaa
+daaaaaaafeacaaaabeagaaaajmagaaaaebgpgodjbmacaaaabmacaaaaaaacpppp
+miabaaaafeaaaaaaadaadaaaaaaafeaaaaaafeaaadaaceaaaaaafeaaabaaaaaa
+acababaaaaacacaaaaaaagaaabaaaaaaaaaaaaaaaaaaajaaafaaabaaaaaaaaaa
+abaaaaaaabaaagaaaaaaaaaaaaacppppfbaaaaafahaaapkaaaaaaadpaaaaaaaa
+aaaaiadpaaaaaaaabpaaaaacaaaaaaiaaaaaahlabpaaaaacaaaaaaiaabaachla
+bpaaaaacaaaaaaiaacaaahlabpaaaaacaaaaaajaaaaiapkabpaaaaacaaaaaaja
+abaiapkabpaaaaacaaaaaajaacaiapkaafaaaaadaaaacpiaacaafflaacaaoeka
+aeaaaaaeaaaacpiaabaaoekaacaaaalaaaaaoeiaaeaaaaaeaaaacpiaadaaoeka
+acaakklaaaaaoeiaacaaaaadaaaacpiaaaaaoeiaaeaaoekaagaaaaacaaaaaiia
+aaaappiaaeaaaaaeabaacdiaaaaaoeiaaaaappiaahaaaakaaiaaaaadaaaaadia
+aaaaoeiaaaaaoeiaecaaaaadabaacpiaabaaoeiaaaaioekaecaaaaadacaacpia
+aaaaoeiaabaioekaecaaaaadadaacpiaaaaaoelaacaioekaafaaaaadadaaaiia
+abaappiaacaaaaiaafaaaaadabaachiaadaappiaaaaaoekafiaaaaaeaaaachia
+aaaakkibahaaffkaabaaoeiaafaaaaadabaachiaadaaoeiaafaaoekaafaaaaad
+aaaachiaaaaaoeiaabaaoeiaacaaaaadabaaahiaacaaoelbagaaoekaceaaaaac
+acaachiaabaaoeiaaiaaaaadaaaaciiaabaaoelaacaaoeiaalaaaaadabaacbia
+aaaappiaahaaffkaafaaaaadaaaachiaaaaaoeiaabaaaaiaabaaaaacaaaaaiia
+ahaakkkaabaaaaacaaaicpiaaaaaoeiappppaaaafdeieefcliadaaaaeaaaaaaa
+ooaaaaaafjaaaaaeegiocaaaaaaaaaaaaoaaaaaafjaaaaaeegiocaaaabaaaaaa
+abaaaaaafkaaaaadaagabaaaaaaaaaaafkaaaaadaagabaaaabaaaaaafkaaaaad
+aagabaaaacaaaaaafibiaaaeaahabaaaaaaaaaaaffffaaaafibiaaaeaahabaaa
+abaaaaaaffffaaaafibiaaaeaahabaaaacaaaaaaffffaaaagcbaaaaddcbabaaa
+abaaaaaagcbaaaadhcbabaaaacaaaaaagcbaaaadhcbabaaaadaaaaaagfaaaaad
+pccabaaaaaaaaaaagiaaaaacadaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaa
+adaaaaaaegiocaaaaaaaaaaaakaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaa
+aaaaaaaaajaaaaaaagbabaaaadaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaa
+aaaaaaaaegiocaaaaaaaaaaaalaaaaaakgbkbaaaadaaaaaaegaobaaaaaaaaaaa
+aaaaaaaipcaabaaaaaaaaaaaegaobaaaaaaaaaaaegiocaaaaaaaaaaaamaaaaaa
+aoaaaaahdcaabaaaabaaaaaaegaabaaaaaaaaaaapgapbaaaaaaaaaaaaaaaaaak
+dcaabaaaabaaaaaaegaabaaaabaaaaaaaceaaaaaaaaaaadpaaaaaadpaaaaaaaa
+aaaaaaaaefaaaaajpcaabaaaabaaaaaaegaabaaaabaaaaaaeghobaaaabaaaaaa
+aagabaaaaaaaaaaadbaaaaahicaabaaaaaaaaaaaabeaaaaaaaaaaaaackaabaaa
+aaaaaaaabaaaaaahbcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaa
+efaaaaajpcaabaaaacaaaaaaagaabaaaaaaaaaaaeghobaaaacaaaaaaaagabaaa
+abaaaaaaabaaaaahbcaabaaaaaaaaaaadkaabaaaaaaaaaaaabeaaaaaaaaaiadp
+diaaaaahbcaabaaaaaaaaaaadkaabaaaabaaaaaaakaabaaaaaaaaaaadiaaaaah
+bcaabaaaaaaaaaaaakaabaaaacaaaaaaakaabaaaaaaaaaaadiaaaaaihcaabaaa
+aaaaaaaaagaabaaaaaaaaaaaegiccaaaaaaaaaaaagaaaaaaefaaaaajpcaabaaa
+abaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaaacaaaaaadiaaaaai
+hcaabaaaabaaaaaaegacbaaaabaaaaaaegiccaaaaaaaaaaaanaaaaaadiaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaaaaaaaaajhcaabaaa
+abaaaaaaegbcbaiaebaaaaaaadaaaaaaegiccaaaabaaaaaaaaaaaaaabaaaaaah
+icaabaaaaaaaaaaaegacbaaaabaaaaaaegacbaaaabaaaaaaeeaaaaaficaabaaa
+aaaaaaaadkaabaaaaaaaaaaadiaaaaahhcaabaaaabaaaaaapgapbaaaaaaaaaaa
+egacbaaaabaaaaaabaaaaaahicaabaaaaaaaaaaaegbcbaaaacaaaaaaegacbaaa
+abaaaaaadeaaaaahicaabaaaaaaaaaaadkaabaaaaaaaaaaaabeaaaaaaaaaaaaa
+diaaaaahhccabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadgaaaaaf
+iccabaaaaaaaaaaaabeaaaaaaaaaiadpdoaaaaabejfdeheoiaaaaaaaaeaaaaaa
+aiaaaaaagiaaaaaaaaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaaheaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaabaaaaaaadadaaaaheaaaaaaabaaaaaaaaaaaaaa
+adaaaaaaacaaaaaaahahaaaaheaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaa
+ahahaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklklepfdeheo
+cmaaaaaaabaaaaaaaiaaaaaacaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaa
+apaaaaaafdfgfpfegbhcghgfheaaklkl"
+}
+SubProgram "d3d9 " {
+// Stats: 19 math, 3 textures
+Keywords { "POINT_COOKIE" }
+Matrix 0 [_LightMatrix0] 3
+Vector 5 [_Color]
+Vector 4 [_LightColor0]
+Vector 3 [_WorldSpaceLightPos0]
+SetTexture 0 [_LightTexture0] CUBE 0
+SetTexture 1 [_LightTextureB0] 2D 1
+SetTexture 2 [_MainTex] 2D 2
+"ps_2_0
+def c6, 1, 0, 0, 0
+dcl t0.xy
+dcl_pp t1.xyz
+dcl t2.xyz
+dcl_cube s0
+dcl_2d s1
+dcl_2d s2
+mov r0.xyz, t2
+mov_pp r0.w, c6.x
+dp4 r1.x, c0, r0
+dp4 r1.y, c1, r0
+dp4 r1.z, c2, r0
+dp3 r0.xy, r1, r1
+texld r1, r1, s0
+texld r0, r0, s1
+texld_pp r2, t0, s2
+mul_pp r2.w, r1.w, r0.x
+mul_pp r0.xyz, r2.w, c4
+mul_pp r1.xyz, r2, c5
+mul_pp r0.xyz, r0, r1
+add r1.xyz, -t2, c3
+nrm_pp r2.xyz, r1
+dp3_pp r0.w, t1, r2
+max_pp r1.x, r0.w, c6.y
+mul_pp r0.xyz, r0, r1.x
+mov_pp r0.w, c6.x
+mov_pp oC0, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 16 math, 3 textures
+Keywords { "POINT_COOKIE" }
+SetTexture 0 [_MainTex] 2D 2
+SetTexture 1 [_LightTextureB0] 2D 1
+SetTexture 2 [_LightTexture0] CUBE 0
+ConstBuffer "$Globals" 240
+Matrix 144 [_LightMatrix0]
+Vector 96 [_LightColor0]
+Vector 208 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+"ps_4_0
+root12:adacadaa
+eefiecedankidodhcphkpkkhfmalipljneadkgfpabaaaaaabaaeaaaaadaaaaaa
+cmaaaaaaleaaaaaaoiaaaaaaejfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaadadaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaheaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahahaaaafdfgfpfa
+epfdejfeejepeoaafeeffiedepepfceeaaklklklepfdeheocmaaaaaaabaaaaaa
+aiaaaaaacaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapaaaaaafdfgfpfe
+gbhcghgfheaaklklfdeieefccaadaaaaeaaaaaaamiaaaaaafjaaaaaeegiocaaa
+aaaaaaaaaoaaaaaafjaaaaaeegiocaaaabaaaaaaabaaaaaafkaaaaadaagabaaa
+aaaaaaaafkaaaaadaagabaaaabaaaaaafkaaaaadaagabaaaacaaaaaafibiaaae
+aahabaaaaaaaaaaaffffaaaafibiaaaeaahabaaaabaaaaaaffffaaaafidaaaae
+aahabaaaacaaaaaaffffaaaagcbaaaaddcbabaaaabaaaaaagcbaaaadhcbabaaa
+acaaaaaagcbaaaadhcbabaaaadaaaaaagfaaaaadpccabaaaaaaaaaaagiaaaaac
+acaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaaadaaaaaaegiccaaaaaaaaaaa
+akaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaaaaaaaaaajaaaaaaagbabaaa
+adaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaaaaaaaaa
+alaaaaaakgbkbaaaadaaaaaaegacbaaaaaaaaaaaaaaaaaaihcaabaaaaaaaaaaa
+egacbaaaaaaaaaaaegiccaaaaaaaaaaaamaaaaaabaaaaaahicaabaaaaaaaaaaa
+egacbaaaaaaaaaaaegacbaaaaaaaaaaaefaaaaajpcaabaaaabaaaaaaegacbaaa
+aaaaaaaaeghobaaaacaaaaaaaagabaaaaaaaaaaaefaaaaajpcaabaaaaaaaaaaa
+pgapbaaaaaaaaaaaeghobaaaabaaaaaaaagabaaaabaaaaaadiaaaaahbcaabaaa
+aaaaaaaadkaabaaaabaaaaaaakaabaaaaaaaaaaadiaaaaaihcaabaaaaaaaaaaa
+agaabaaaaaaaaaaaegiccaaaaaaaaaaaagaaaaaaefaaaaajpcaabaaaabaaaaaa
+egbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaaacaaaaaadiaaaaaihcaabaaa
+abaaaaaaegacbaaaabaaaaaaegiccaaaaaaaaaaaanaaaaaadiaaaaahhcaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaaaaaaaaajhcaabaaaabaaaaaa
+egbcbaiaebaaaaaaadaaaaaaegiccaaaabaaaaaaaaaaaaaabaaaaaahicaabaaa
+aaaaaaaaegacbaaaabaaaaaaegacbaaaabaaaaaaeeaaaaaficaabaaaaaaaaaaa
+dkaabaaaaaaaaaaadiaaaaahhcaabaaaabaaaaaapgapbaaaaaaaaaaaegacbaaa
+abaaaaaabaaaaaahicaabaaaaaaaaaaaegbcbaaaacaaaaaaegacbaaaabaaaaaa
+deaaaaahicaabaaaaaaaaaaadkaabaaaaaaaaaaaabeaaaaaaaaaaaaadiaaaaah
+hccabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadgaaaaaficcabaaa
+aaaaaaaaabeaaaaaaaaaiadpdoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 16 math, 3 textures
+Keywords { "POINT_COOKIE" }
+SetTexture 0 [_MainTex] 2D 2
+SetTexture 1 [_LightTextureB0] 2D 1
+SetTexture 2 [_LightTexture0] CUBE 0
+ConstBuffer "$Globals" 240
+Matrix 144 [_LightMatrix0]
+Vector 96 [_LightColor0]
+Vector 208 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+"ps_4_0_level_9_1
+root12:adacadaa
+eefiecedahfojdaejjfiakdehmmnfhaikfdbdikfabaaaaaabaagaaaaaeaaaaaa
+daaaaaaacmacaaaafeafaaaanmafaaaaebgpgodjpeabaaaapeabaaaaaaacpppp
+kaabaaaafeaaaaaaadaadaaaaaaafeaaaaaafeaaadaaceaaaaaafeaaacaaaaaa
+abababaaaaacacaaaaaaagaaabaaaaaaaaaaaaaaaaaaajaaafaaabaaaaaaaaaa
+abaaaaaaabaaagaaaaaaaaaaaaacppppfbaaaaafahaaapkaaaaaaaaaaaaaiadp
+aaaaaaaaaaaaaaaabpaaaaacaaaaaaiaaaaaahlabpaaaaacaaaaaaiaabaachla
+bpaaaaacaaaaaaiaacaaahlabpaaaaacaaaaaajiaaaiapkabpaaaaacaaaaaaja
+abaiapkabpaaaaacaaaaaajaacaiapkaafaaaaadaaaachiaacaafflaacaaoeka
+aeaaaaaeaaaachiaabaaoekaacaaaalaaaaaoeiaaeaaaaaeaaaachiaadaaoeka
+acaakklaaaaaoeiaacaaaaadaaaaahiaaaaaoeiaaeaaoekaaiaaaaadaaaaaiia
+aaaaoeiaaaaaoeiaabaaaaacabaaadiaaaaappiaecaaaaadaaaaapiaaaaaoeia
+aaaioekaecaaaaadabaaapiaabaaoeiaabaioekaecaaaaadacaacpiaaaaaoela
+acaioekaafaaaaadacaaciiaaaaappiaabaaaaiaafaaaaadaaaachiaacaappia
+aaaaoekaafaaaaadabaachiaacaaoeiaafaaoekaafaaaaadaaaachiaaaaaoeia
+abaaoeiaacaaaaadabaaahiaacaaoelbagaaoekaceaaaaacacaachiaabaaoeia
+aiaaaaadaaaaciiaabaaoelaacaaoeiaalaaaaadabaacbiaaaaappiaahaaaaka
+afaaaaadaaaachiaaaaaoeiaabaaaaiaabaaaaacaaaaciiaahaaffkaabaaaaac
+aaaicpiaaaaaoeiappppaaaafdeieefccaadaaaaeaaaaaaamiaaaaaafjaaaaae
+egiocaaaaaaaaaaaaoaaaaaafjaaaaaeegiocaaaabaaaaaaabaaaaaafkaaaaad
+aagabaaaaaaaaaaafkaaaaadaagabaaaabaaaaaafkaaaaadaagabaaaacaaaaaa
+fibiaaaeaahabaaaaaaaaaaaffffaaaafibiaaaeaahabaaaabaaaaaaffffaaaa
+fidaaaaeaahabaaaacaaaaaaffffaaaagcbaaaaddcbabaaaabaaaaaagcbaaaad
+hcbabaaaacaaaaaagcbaaaadhcbabaaaadaaaaaagfaaaaadpccabaaaaaaaaaaa
+giaaaaacacaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaaadaaaaaaegiccaaa
+aaaaaaaaakaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaaaaaaaaaaajaaaaaa
+agbabaaaadaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaa
+aaaaaaaaalaaaaaakgbkbaaaadaaaaaaegacbaaaaaaaaaaaaaaaaaaihcaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegiccaaaaaaaaaaaamaaaaaabaaaaaahicaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaefaaaaajpcaabaaaabaaaaaa
+egacbaaaaaaaaaaaeghobaaaacaaaaaaaagabaaaaaaaaaaaefaaaaajpcaabaaa
+aaaaaaaapgapbaaaaaaaaaaaeghobaaaabaaaaaaaagabaaaabaaaaaadiaaaaah
+bcaabaaaaaaaaaaadkaabaaaabaaaaaaakaabaaaaaaaaaaadiaaaaaihcaabaaa
+aaaaaaaaagaabaaaaaaaaaaaegiccaaaaaaaaaaaagaaaaaaefaaaaajpcaabaaa
+abaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaaacaaaaaadiaaaaai
+hcaabaaaabaaaaaaegacbaaaabaaaaaaegiccaaaaaaaaaaaanaaaaaadiaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaaaaaaaaajhcaabaaa
+abaaaaaaegbcbaiaebaaaaaaadaaaaaaegiccaaaabaaaaaaaaaaaaaabaaaaaah
+icaabaaaaaaaaaaaegacbaaaabaaaaaaegacbaaaabaaaaaaeeaaaaaficaabaaa
+aaaaaaaadkaabaaaaaaaaaaadiaaaaahhcaabaaaabaaaaaapgapbaaaaaaaaaaa
+egacbaaaabaaaaaabaaaaaahicaabaaaaaaaaaaaegbcbaaaacaaaaaaegacbaaa
+abaaaaaadeaaaaahicaabaaaaaaaaaaadkaabaaaaaaaaaaaabeaaaaaaaaaaaaa
+diaaaaahhccabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadgaaaaaf
+iccabaaaaaaaaaaaabeaaaaaaaaaiadpdoaaaaabejfdeheoiaaaaaaaaeaaaaaa
+aiaaaaaagiaaaaaaaaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaaheaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaabaaaaaaadadaaaaheaaaaaaabaaaaaaaaaaaaaa
+adaaaaaaacaaaaaaahahaaaaheaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaa
+ahahaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklklepfdeheo
+cmaaaaaaabaaaaaaaiaaaaaacaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaa
+apaaaaaafdfgfpfegbhcghgfheaaklkl"
+}
+SubProgram "d3d9 " {
+// Stats: 12 math, 2 textures
+Keywords { "DIRECTIONAL_COOKIE" }
+Matrix 0 [_LightMatrix0] 2
+Vector 4 [_Color]
+Vector 3 [_LightColor0]
+Vector 2 [_WorldSpaceLightPos0]
+SetTexture 0 [_LightTexture0] 2D 0
+SetTexture 1 [_MainTex] 2D 1
+"ps_2_0
+def c5, 1, 0, 0, 0
+dcl t0.xy
+dcl_pp t1.xyz
+dcl t2.xyz
+dcl_2d s0
+dcl_2d s1
+mov r0.xyz, t2
+mov_pp r0.w, c5.x
+dp4 r1.x, c0, r0
+dp4 r1.y, c1, r0
+texld_pp r0, r1, s0
+texld_pp r1, t0, s1
+mul_pp r0.xyz, r0.w, c3
+mul_pp r1.xyz, r1, c4
+mul_pp r0.xyz, r0, r1
+dp3_pp r0.w, t1, c2
+max_pp r1.x, r0.w, c5.y
+mul_pp r0.xyz, r0, r1.x
+mov_pp r0.w, c5.x
+mov_pp oC0, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 10 math, 2 textures
+Keywords { "DIRECTIONAL_COOKIE" }
+SetTexture 0 [_MainTex] 2D 1
+SetTexture 1 [_LightTexture0] 2D 0
+ConstBuffer "$Globals" 240
+Matrix 144 [_LightMatrix0]
+Vector 96 [_LightColor0]
+Vector 208 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+"ps_4_0
+root12:acacacaa
+eefiecedppakfflheanfkcjoniddfjogoajclhncabaaaaaacmadaaaaadaaaaaa
+cmaaaaaaleaaaaaaoiaaaaaaejfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaadadaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaheaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahahaaaafdfgfpfa
+epfdejfeejepeoaafeeffiedepepfceeaaklklklepfdeheocmaaaaaaabaaaaaa
+aiaaaaaacaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapaaaaaafdfgfpfe
+gbhcghgfheaaklklfdeieefcdmacaaaaeaaaaaaaipaaaaaafjaaaaaeegiocaaa
+aaaaaaaaaoaaaaaafjaaaaaeegiocaaaabaaaaaaabaaaaaafkaaaaadaagabaaa
+aaaaaaaafkaaaaadaagabaaaabaaaaaafibiaaaeaahabaaaaaaaaaaaffffaaaa
+fibiaaaeaahabaaaabaaaaaaffffaaaagcbaaaaddcbabaaaabaaaaaagcbaaaad
+hcbabaaaacaaaaaagcbaaaadhcbabaaaadaaaaaagfaaaaadpccabaaaaaaaaaaa
+giaaaaacacaaaaaadiaaaaaidcaabaaaaaaaaaaafgbfbaaaadaaaaaaegiacaaa
+aaaaaaaaakaaaaaadcaaaaakdcaabaaaaaaaaaaaegiacaaaaaaaaaaaajaaaaaa
+agbabaaaadaaaaaaegaabaaaaaaaaaaadcaaaaakdcaabaaaaaaaaaaaegiacaaa
+aaaaaaaaalaaaaaakgbkbaaaadaaaaaaegaabaaaaaaaaaaaaaaaaaaidcaabaaa
+aaaaaaaaegaabaaaaaaaaaaaegiacaaaaaaaaaaaamaaaaaaefaaaaajpcaabaaa
+aaaaaaaaegaabaaaaaaaaaaaeghobaaaabaaaaaaaagabaaaaaaaaaaadiaaaaai
+hcaabaaaaaaaaaaapgapbaaaaaaaaaaaegiccaaaaaaaaaaaagaaaaaaefaaaaaj
+pcaabaaaabaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaaabaaaaaa
+diaaaaaihcaabaaaabaaaaaaegacbaaaabaaaaaaegiccaaaaaaaaaaaanaaaaaa
+diaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaai
+icaabaaaaaaaaaaaegbcbaaaacaaaaaaegiccaaaabaaaaaaaaaaaaaadeaaaaah
+icaabaaaaaaaaaaadkaabaaaaaaaaaaaabeaaaaaaaaaaaaadiaaaaahhccabaaa
+aaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadgaaaaaficcabaaaaaaaaaaa
+abeaaaaaaaaaiadpdoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 10 math, 2 textures
+Keywords { "DIRECTIONAL_COOKIE" }
+SetTexture 0 [_MainTex] 2D 1
+SetTexture 1 [_LightTexture0] 2D 0
+ConstBuffer "$Globals" 240
+Matrix 144 [_LightMatrix0]
+Vector 96 [_LightColor0]
+Vector 208 [_Color]
+ConstBuffer "UnityLighting" 720
+Vector 0 [_WorldSpaceLightPos0]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+"ps_4_0_level_9_1
+root12:acacacaa
+eefiecedpibhmghldjjfnokiknbogapdhemimgdaabaaaaaameaeaaaaaeaaaaaa
+daaaaaaameabaaaaaiaeaaaajaaeaaaaebgpgodjimabaaaaimabaaaaaaacpppp
+dmabaaaafaaaaaaaadaacmaaaaaafaaaaaaafaaaacaaceaaaaaafaaaabaaaaaa
+aaababaaaaaaagaaabaaaaaaaaaaaaaaaaaaajaaafaaabaaaaaaaaaaabaaaaaa
+abaaagaaaaaaaaaaaaacppppfbaaaaafahaaapkaaaaaaaaaaaaaiadpaaaaaaaa
+aaaaaaaabpaaaaacaaaaaaiaaaaaadlabpaaaaacaaaaaaiaabaachlabpaaaaac
+aaaaaaiaacaaahlabpaaaaacaaaaaajaaaaiapkabpaaaaacaaaaaajaabaiapka
+afaaaaadaaaacdiaacaafflaacaaoekaaeaaaaaeaaaacdiaabaaoekaacaaaala
+aaaaoeiaaeaaaaaeaaaacdiaadaaoekaacaakklaaaaaoeiaacaaaaadaaaaadia
+aaaaoeiaaeaaoekaecaaaaadaaaacpiaaaaaoeiaaaaioekaecaaaaadabaacpia
+aaaaoelaabaioekaafaaaaadaaaachiaaaaappiaaaaaoekaafaaaaadabaachia
+abaaoeiaafaaoekaafaaaaadaaaachiaaaaaoeiaabaaoeiaaiaaaaadaaaaciia
+abaaoelaagaaoekaalaaaaadabaacbiaaaaappiaahaaaakaafaaaaadaaaachia
+aaaaoeiaabaaaaiaabaaaaacaaaaciiaahaaffkaabaaaaacaaaicpiaaaaaoeia
+ppppaaaafdeieefcdmacaaaaeaaaaaaaipaaaaaafjaaaaaeegiocaaaaaaaaaaa
+aoaaaaaafjaaaaaeegiocaaaabaaaaaaabaaaaaafkaaaaadaagabaaaaaaaaaaa
+fkaaaaadaagabaaaabaaaaaafibiaaaeaahabaaaaaaaaaaaffffaaaafibiaaae
+aahabaaaabaaaaaaffffaaaagcbaaaaddcbabaaaabaaaaaagcbaaaadhcbabaaa
+acaaaaaagcbaaaadhcbabaaaadaaaaaagfaaaaadpccabaaaaaaaaaaagiaaaaac
+acaaaaaadiaaaaaidcaabaaaaaaaaaaafgbfbaaaadaaaaaaegiacaaaaaaaaaaa
+akaaaaaadcaaaaakdcaabaaaaaaaaaaaegiacaaaaaaaaaaaajaaaaaaagbabaaa
+adaaaaaaegaabaaaaaaaaaaadcaaaaakdcaabaaaaaaaaaaaegiacaaaaaaaaaaa
+alaaaaaakgbkbaaaadaaaaaaegaabaaaaaaaaaaaaaaaaaaidcaabaaaaaaaaaaa
+egaabaaaaaaaaaaaegiacaaaaaaaaaaaamaaaaaaefaaaaajpcaabaaaaaaaaaaa
+egaabaaaaaaaaaaaeghobaaaabaaaaaaaagabaaaaaaaaaaadiaaaaaihcaabaaa
+aaaaaaaapgapbaaaaaaaaaaaegiccaaaaaaaaaaaagaaaaaaefaaaaajpcaabaaa
+abaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaaabaaaaaadiaaaaai
+hcaabaaaabaaaaaaegacbaaaabaaaaaaegiccaaaaaaaaaaaanaaaaaadiaaaaah
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaaiicaabaaa
+aaaaaaaaegbcbaaaacaaaaaaegiccaaaabaaaaaaaaaaaaaadeaaaaahicaabaaa
+aaaaaaaadkaabaaaaaaaaaaaabeaaaaaaaaaaaaadiaaaaahhccabaaaaaaaaaaa
+pgapbaaaaaaaaaaaegacbaaaaaaaaaaadgaaaaaficcabaaaaaaaaaaaabeaaaaa
+aaaaiadpdoaaaaabejfdeheoiaaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaa
+abaaaaaaadaaaaaaaaaaaaaaapaaaaaaheaaaaaaaaaaaaaaaaaaaaaaadaaaaaa
+abaaaaaaadadaaaaheaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahahaaaa
+heaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahahaaaafdfgfpfaepfdejfe
+ejepeoaafeeffiedepepfceeaaklklklepfdeheocmaaaaaaabaaaaaaaiaaaaaa
+caaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapaaaaaafdfgfpfegbhcghgf
+heaaklkl"
+}
+}
+ }
+
+
+ // Stats for Vertex shader:
+ //       d3d11 : 22 math
+ //    d3d11_9x : 22 math
+ //        d3d9 : 13 math
+ // Stats for Fragment shader:
+ //       d3d11 : 1 math
+ //    d3d11_9x : 1 math
+ //        d3d9 : 3 math
+ Pass {
+  Name "PREPASS"
+  Tags { "LIGHTMODE"="PrePassBase" "RenderType"="Opaque" }
+  GpuProgramID 154971
+Program "vp" {
+SubProgram "d3d9 " {
+// Stats: 13 math
+Bind "vertex" Vertex
+Bind "normal" Normal
+Matrix 4 [_Object2World] 3
+Matrix 7 [_World2Object] 3
+Matrix 0 [glstate_matrix_mvp]
+"vs_2_0
+dcl_position v0
+dcl_normal v1
+dp4 oPos.x, c0, v0
+dp4 oPos.y, c1, v0
+dp4 oPos.z, c2, v0
+dp4 oPos.w, c3, v0
+dp4 oT1.x, c4, v0
+dp4 oT1.y, c5, v0
+dp4 oT1.z, c6, v0
+mul r0.xyz, v1.y, c8
+mad r0.xyz, c7, v1.x, r0
+mad r0.xyz, c9, v1.z, r0
+dp3 r0.w, r0, r0
+rsq r0.w, r0.w
+mul oT0.xyz, r0.w, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 22 math
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "UnityPerDraw" 0
+"vs_4_0
+root12:aaabaaaa
+eefiecedinidogaapcaihlhlafeaicjabdmdpgobabaaaaaaneaeaaaaadaaaaaa
+cmaaaaaaceabaaaajeabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapaaaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheogiaaaaaaadaaaaaaaiaaaaaafaaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaafmaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+ahaiaaaafmaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaafdfgfpfa
+epfdejfeejepeoaafeeffiedepepfceeaaklklklfdeieefcdiadaaaaeaaaabaa
+moaaaaaafjaaaaaeegiocaaaaaaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaa
+fpaaaaadhcbabaaaacaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaad
+hccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagiaaaaacacaaaaaadiaaaaai
+pcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaaaaaaaaaabaaaaaadcaaaaak
+pcaabaaaaaaaaaaaegiocaaaaaaaaaaaaaaaaaaaagbabaaaaaaaaaaaegaobaaa
+aaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaaaaaaaaaacaaaaaakgbkbaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaakpccabaaaaaaaaaaaegiocaaaaaaaaaaa
+adaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadiaaaaaibcaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaaaaaaaaabaaaaaaadiaaaaaiccaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaaaaaaaaabbaaaaaadiaaaaaiecaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaaaaaaaaabcaaaaaadiaaaaaibcaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaaaaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaaaaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaaaaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaa
+egacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaaibcaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaaaaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaaaaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaaaaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaa
+aaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaaaaaaaaaa
+egacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaadiaaaaah
+hccabaaaabaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaa
+aaaaaaaafgbfbaaaaaaaaaaaegiccaaaaaaaaaaaanaaaaaadcaaaaakhcaabaaa
+aaaaaaaaegiccaaaaaaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaaaaaaaaaa
+dcaaaaakhcaabaaaaaaaaaaaegiccaaaaaaaaaaaaoaaaaaakgbkbaaaaaaaaaaa
+egacbaaaaaaaaaaadcaaaaakhccabaaaacaaaaaaegiccaaaaaaaaaaaapaaaaaa
+pgbpbaaaaaaaaaaaegacbaaaaaaaaaaadoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 22 math
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "UnityPerDraw" 0
+"vs_4_0_level_9_1
+root12:aaabaaaa
+eefiecedfimbpiggiminkfbhlgdjijhgmgblgjidabaaaaaaneagaaaaaeaaaaaa
+daaaaaaacmacaaaagmafaaaageagaaaaebgpgodjpeabaaaapeabaaaaaaacpopp
+leabaaaaeaaaaaaaacaaceaaaaaadmaaaaaadmaaaaaaceaaabaadmaaaaaaaaaa
+aeaaabaaaaaaaaaaaaaaamaaahaaafaaaaaaaaaaaaaaaaaaaaacpoppbpaaaaac
+afaaaaiaaaaaapjabpaaaaacafaaaciaacaaapjaafaaaaadaaaaahiaaaaaffja
+agaaoekaaeaaaaaeaaaaahiaafaaoekaaaaaaajaaaaaoeiaaeaaaaaeaaaaahia
+ahaaoekaaaaakkjaaaaaoeiaaeaaaaaeabaaahoaaiaaoekaaaaappjaaaaaoeia
+afaaaaadaaaaabiaacaaaajaajaaaakaafaaaaadaaaaaciaacaaaajaakaaaaka
+afaaaaadaaaaaeiaacaaaajaalaaaakaafaaaaadabaaabiaacaaffjaajaaffka
+afaaaaadabaaaciaacaaffjaakaaffkaafaaaaadabaaaeiaacaaffjaalaaffka
+acaaaaadaaaaahiaaaaaoeiaabaaoeiaafaaaaadabaaabiaacaakkjaajaakkka
+afaaaaadabaaaciaacaakkjaakaakkkaafaaaaadabaaaeiaacaakkjaalaakkka
+acaaaaadaaaaahiaaaaaoeiaabaaoeiaaiaaaaadaaaaaiiaaaaaoeiaaaaaoeia
+ahaaaaacaaaaaiiaaaaappiaafaaaaadaaaaahoaaaaappiaaaaaoeiaafaaaaad
+aaaaapiaaaaaffjaacaaoekaaeaaaaaeaaaaapiaabaaoekaaaaaaajaaaaaoeia
+aeaaaaaeaaaaapiaadaaoekaaaaakkjaaaaaoeiaaeaaaaaeaaaaapiaaeaaoeka
+aaaappjaaaaaoeiaaeaaaaaeaaaaadmaaaaappiaaaaaoekaaaaaoeiaabaaaaac
+aaaaammaaaaaoeiappppaaaafdeieefcdiadaaaaeaaaabaamoaaaaaafjaaaaae
+egiocaaaaaaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaa
+acaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaadhccabaaaabaaaaaa
+gfaaaaadhccabaaaacaaaaaagiaaaaacacaaaaaadiaaaaaipcaabaaaaaaaaaaa
+fgbfbaaaaaaaaaaaegiocaaaaaaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaa
+egiocaaaaaaaaaaaaaaaaaaaagbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaak
+pcaabaaaaaaaaaaaegiocaaaaaaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaa
+aaaaaaaadcaaaaakpccabaaaaaaaaaaaegiocaaaaaaaaaaaadaaaaaapgbpbaaa
+aaaaaaaaegaobaaaaaaaaaaadiaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaaaaaaaaabaaaaaaadiaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaaaaaaaaabbaaaaaadiaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaa
+akiacaaaaaaaaaaabcaaaaaadiaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaaaaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaaaaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaa
+bkiacaaaaaaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaa
+egacbaaaabaaaaaadiaaaaaibcaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+aaaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+aaaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaackbabaaaacaaaaaackiacaaa
+aaaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaa
+abaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaa
+eeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaadiaaaaahhccabaaaabaaaaaa
+pgapbaaaaaaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaaaaaaaaaafgbfbaaa
+aaaaaaaaegiccaaaaaaaaaaaanaaaaaadcaaaaakhcaabaaaaaaaaaaaegiccaaa
+aaaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaaaaaaaaaadcaaaaakhcaabaaa
+aaaaaaaaegiccaaaaaaaaaaaaoaaaaaakgbkbaaaaaaaaaaaegacbaaaaaaaaaaa
+dcaaaaakhccabaaaacaaaaaaegiccaaaaaaaaaaaapaaaaaapgbpbaaaaaaaaaaa
+egacbaaaaaaaaaaadoaaaaabejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapaaaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheogiaaaaaaadaaaaaaaiaaaaaafaaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaafmaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+ahaiaaaafmaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaafdfgfpfa
+epfdejfeejepeoaafeeffiedepepfceeaaklklkl"
+}
+}
+Program "fp" {
+SubProgram "d3d9 " {
+// Stats: 3 math
+"ps_2_0
+def c0, 0.5, 0, 0, 0
+dcl_pp t0.xyz
+mad_pp r0.xyz, t0, c0.x, c0.x
+mov_pp r0.w, c0.y
+mov_pp oC0, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 1 math
+"ps_4_0
+root12:aaaaaaaa
+eefiecedahndifnccigjgehbcgabbojggkeiepneabaaaaaaemabaaaaadaaaaaa
+cmaaaaaajmaaaaaanaaaaaaaejfdeheogiaaaaaaadaaaaaaaiaaaaaafaaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaafmaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaahahaaaafmaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahaaaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklklepfdeheo
+cmaaaaaaabaaaaaaaiaaaaaacaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaa
+apaaaaaafdfgfpfegbhcghgfheaaklklfdeieefcheaaaaaaeaaaaaaabnaaaaaa
+gcbaaaadhcbabaaaabaaaaaagfaaaaadpccabaaaaaaaaaaadcaaaaaphccabaaa
+aaaaaaaaegbcbaaaabaaaaaaaceaaaaaaaaaaadpaaaaaadpaaaaaadpaaaaaaaa
+aceaaaaaaaaaaadpaaaaaadpaaaaaadpaaaaaaaadgaaaaaficcabaaaaaaaaaaa
+abeaaaaaaaaaaaaadoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 1 math
+"ps_4_0_level_9_1
+root12:aaaaaaaa
+eefiecedlhbojekhenomcgbelfdkmofngcodlfjbabaaaaaaneabaaaaaeaaaaaa
+daaaaaaaleaaaaaadaabaaaakaabaaaaebgpgodjhmaaaaaahmaaaaaaaaacpppp
+fiaaaaaaceaaaaaaaaaaceaaaaaaceaaaaaaceaaaaaaceaaaaaaceaaaaacpppp
+fbaaaaafaaaaapkaaaaaaadpaaaaaaaaaaaaaaaaaaaaaaaabpaaaaacaaaaaaia
+aaaachlaaeaaaaaeaaaachiaaaaaoelaaaaaaakaaaaaaakaabaaaaacaaaaciia
+aaaaffkaabaaaaacaaaicpiaaaaaoeiappppaaaafdeieefcheaaaaaaeaaaaaaa
+bnaaaaaagcbaaaadhcbabaaaabaaaaaagfaaaaadpccabaaaaaaaaaaadcaaaaap
+hccabaaaaaaaaaaaegbcbaaaabaaaaaaaceaaaaaaaaaaadpaaaaaadpaaaaaadp
+aaaaaaaaaceaaaaaaaaaaadpaaaaaadpaaaaaadpaaaaaaaadgaaaaaficcabaaa
+aaaaaaaaabeaaaaaaaaaaaaadoaaaaabejfdeheogiaaaaaaadaaaaaaaiaaaaaa
+faaaaaaaaaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaafmaaaaaaaaaaaaaa
+aaaaaaaaadaaaaaaabaaaaaaahahaaaafmaaaaaaabaaaaaaaaaaaaaaadaaaaaa
+acaaaaaaahaaaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklkl
+epfdeheocmaaaaaaabaaaaaaaiaaaaaacaaaaaaaaaaaaaaaaaaaaaaaadaaaaaa
+aaaaaaaaapaaaaaafdfgfpfegbhcghgfheaaklkl"
+}
+}
+ }
+
+
+ // Stats for Vertex shader:
+ //       d3d11 : 38 math
+ //    d3d11_9x : 38 math
+ //        d3d9 : 34 math
+ // Stats for Fragment shader:
+ //       d3d11 : 5 avg math (5..6), 3 texture
+ //    d3d11_9x : 5 avg math (5..6), 3 texture
+ //        d3d9 : 9 avg math (8..11), 3 texture
+ Pass {
+  Name "PREPASS"
+  Tags { "LIGHTMODE"="PrePassFinal" "RenderType"="Opaque" }
+  ZWrite Off
+  GpuProgramID 206139
+Program "vp" {
+SubProgram "d3d9 " {
+// Stats: 34 math
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "HDR_LIGHT_PREPASS_OFF" }
+Bind "vertex" Vertex
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+Matrix 4 [_Object2World] 3
+Matrix 7 [_World2Object] 3
+Matrix 0 [glstate_matrix_mvp]
+Vector 20 [_Illum_ST]
+Vector 19 [_MainTex_ST]
+Vector 10 [_ProjectionParams]
+Vector 11 [_ScreenParams]
+Vector 14 [unity_SHAb]
+Vector 13 [unity_SHAg]
+Vector 12 [unity_SHAr]
+Vector 17 [unity_SHBb]
+Vector 16 [unity_SHBg]
+Vector 15 [unity_SHBr]
+Vector 18 [unity_SHC]
+"vs_2_0
+def c21, 0.5, 1, 0, 0
+dcl_position v0
+dcl_normal v1
+dcl_texcoord v2
+mad oT0.xy, v2, c19, c19.zwzw
+mad oT0.zw, v2.xyxy, c20.xyxy, c20
+dp4 oT1.x, c4, v0
+dp4 oT1.y, c5, v0
+dp4 oT1.z, c6, v0
+dp4 r0.y, c1, v0
+mul r1.x, r0.y, c10.x
+mul r1.w, r1.x, c21.x
+dp4 r0.x, c0, v0
+dp4 r0.w, c3, v0
+mul r1.xz, r0.xyww, c21.x
+mad oT2.xy, r1.z, c11.zwzw, r1.xwzw
+mul r1.xyz, v1.y, c8
+mad r1.xyz, c7, v1.x, r1
+mad r1.xyz, c9, v1.z, r1
+nrm r2.xyz, r1
+mul r1.x, r2.y, r2.y
+mad r1.x, r2.x, r2.x, -r1.x
+mul r3, r2.yzzx, r2.xyzz
+dp4 r4.x, c15, r3
+dp4 r4.y, c16, r3
+dp4 r4.z, c17, r3
+mad r1.xyz, c18, r1.x, r4
+mov r2.w, c21.y
+dp4 r3.x, c12, r2
+dp4 r3.y, c13, r2
+dp4 r3.z, c14, r2
+add oT4.xyz, r1, r3
+dp4 r0.z, c2, v0
+mov oPos, r0
+mov oT2.zw, r0
+mov oT3, c21.z
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 38 math
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "HDR_LIGHT_PREPASS_OFF" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 208
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityPerCamera" 144
+Vector 80 [_ProjectionParams]
+ConstBuffer "UnityLighting" 720
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerCamera" 1
+BindCB  "UnityLighting" 2
+BindCB  "UnityPerDraw" 3
+"vs_4_0
+root12:aaaeaaaa
+eefieceddkegmedicbhpghalankilincjcceegagabaaaaaapiahaaaaadaaaaaa
+cmaaaaaaceabaaaanmabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+apaaaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaakeaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaapaaaaaakeaaaaaaadaaaaaaaaaaaaaa
+adaaaaaaaeaaaaaaapaaaaaakeaaaaaaaeaaaaaaaaaaaaaaadaaaaaaafaaaaaa
+ahaiaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklklfdeieefc
+beagaaaaeaaaabaaifabaaaafjaaaaaeegiocaaaaaaaaaaaamaaaaaafjaaaaae
+egiocaaaabaaaaaaagaaaaaafjaaaaaeegiocaaaacaaaaaacnaaaaaafjaaaaae
+egiocaaaadaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaa
+acaaaaaafpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaa
+gfaaaaadpccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadpccabaaa
+adaaaaaagfaaaaadpccabaaaaeaaaaaagfaaaaadhccabaaaafaaaaaagiaaaaac
+aeaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaadaaaaaa
+abaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaaaaaaaaaaagbabaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaa
+acaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaa
+egiocaaaadaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadgaaaaaf
+pccabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaa
+adaaaaaaegiacaaaaaaaaaaaakaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaal
+mccabaaaabaaaaaaagbebaaaadaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaa
+aaaaaaaaalaaaaaadiaaaaaihcaabaaaabaaaaaafgbfbaaaaaaaaaaaegiccaaa
+adaaaaaaanaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaadaaaaaaamaaaaaa
+agbabaaaaaaaaaaaegacbaaaabaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaa
+adaaaaaaaoaaaaaakgbkbaaaaaaaaaaaegacbaaaabaaaaaadcaaaaakhccabaaa
+acaaaaaaegiccaaaadaaaaaaapaaaaaapgbpbaaaaaaaaaaaegacbaaaabaaaaaa
+diaaaaaiccaabaaaaaaaaaaabkaabaaaaaaaaaaaakiacaaaabaaaaaaafaaaaaa
+diaaaaakncaabaaaabaaaaaaagahbaaaaaaaaaaaaceaaaaaaaaaaadpaaaaaaaa
+aaaaaadpaaaaaadpdgaaaaafmccabaaaadaaaaaakgaobaaaaaaaaaaaaaaaaaah
+dccabaaaadaaaaaakgakbaaaabaaaaaamgaabaaaabaaaaaadgaaaaaipccabaaa
+aeaaaaaaaceaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadiaaaaaibcaabaaa
+aaaaaaaaakbabaaaacaaaaaaakiacaaaadaaaaaabaaaaaaadiaaaaaiccaabaaa
+aaaaaaaaakbabaaaacaaaaaaakiacaaaadaaaaaabbaaaaaadiaaaaaiecaabaaa
+aaaaaaaaakbabaaaacaaaaaaakiacaaaadaaaaaabcaaaaaadiaaaaaibcaabaaa
+abaaaaaabkbabaaaacaaaaaabkiacaaaadaaaaaabaaaaaaadiaaaaaiccaabaaa
+abaaaaaabkbabaaaacaaaaaabkiacaaaadaaaaaabbaaaaaadiaaaaaiecaabaaa
+abaaaaaabkbabaaaacaaaaaabkiacaaaadaaaaaabcaaaaaaaaaaaaahhcaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaaibcaabaaaabaaaaaa
+ckbabaaaacaaaaaackiacaaaadaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaa
+ckbabaaaacaaaaaackiacaaaadaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaa
+ckbabaaaacaaaaaackiacaaaadaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaa
+egacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaa
+aaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaa
+diaaaaahhcaabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadiaaaaah
+bcaabaaaabaaaaaabkaabaaaaaaaaaaabkaabaaaaaaaaaaadcaaaaakbcaabaaa
+abaaaaaaakaabaaaaaaaaaaaakaabaaaaaaaaaaaakaabaiaebaaaaaaabaaaaaa
+diaaaaahpcaabaaaacaaaaaajgacbaaaaaaaaaaaegakbaaaaaaaaaaabbaaaaai
+bcaabaaaadaaaaaaegiocaaaacaaaaaacjaaaaaaegaobaaaacaaaaaabbaaaaai
+ccaabaaaadaaaaaaegiocaaaacaaaaaackaaaaaaegaobaaaacaaaaaabbaaaaai
+ecaabaaaadaaaaaaegiocaaaacaaaaaaclaaaaaaegaobaaaacaaaaaadcaaaaak
+hcaabaaaabaaaaaaegiccaaaacaaaaaacmaaaaaaagaabaaaabaaaaaaegacbaaa
+adaaaaaadgaaaaaficaabaaaaaaaaaaaabeaaaaaaaaaiadpbbaaaaaibcaabaaa
+acaaaaaaegiocaaaacaaaaaacgaaaaaaegaobaaaaaaaaaaabbaaaaaiccaabaaa
+acaaaaaaegiocaaaacaaaaaachaaaaaaegaobaaaaaaaaaaabbaaaaaiecaabaaa
+acaaaaaaegiocaaaacaaaaaaciaaaaaaegaobaaaaaaaaaaaaaaaaaahhccabaaa
+afaaaaaaegacbaaaabaaaaaaegacbaaaacaaaaaadoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 38 math
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "HDR_LIGHT_PREPASS_OFF" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 208
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityPerCamera" 144
+Vector 80 [_ProjectionParams]
+ConstBuffer "UnityLighting" 720
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerCamera" 1
+BindCB  "UnityLighting" 2
+BindCB  "UnityPerDraw" 3
+"vs_4_0_level_9_1
+root12:aaaeaaaa
+eefiecedgjamnnafkjifjdbemjieojplgpococpoabaaaaaagealaaaaaeaaaaaa
+daaaaaaajiadaaaaleajaaaakmakaaaaebgpgodjgaadaaaagaadaaaaaaacpopp
+pmacaaaageaaaaaaafaaceaaaaaagaaaaaaagaaaaaaaceaaabaagaaaaaaaakaa
+acaaabaaaaaaaaaaabaaafaaabaaadaaaaaaaaaaacaacgaaahaaaeaaaaaaaaaa
+adaaaaaaaeaaalaaaaaaaaaaadaaamaaahaaapaaaaaaaaaaaaaaaaaaaaacpopp
+fbaaaaafbgaaapkaaaaaaadpaaaaiadpaaaaaaaaaaaaaaaabpaaaaacafaaaaia
+aaaaapjabpaaaaacafaaaciaacaaapjabpaaaaacafaaadiaadaaapjaaeaaaaae
+aaaaadoaadaaoejaabaaoekaabaaookaaeaaaaaeaaaaamoaadaaeejaacaaeeka
+acaaoekaafaaaaadaaaaahiaaaaaffjabaaaoekaaeaaaaaeaaaaahiaapaaoeka
+aaaaaajaaaaaoeiaaeaaaaaeaaaaahiabbaaoekaaaaakkjaaaaaoeiaaeaaaaae
+abaaahoabcaaoekaaaaappjaaaaaoeiaafaaaaadaaaaapiaaaaaffjaamaaoeka
+aeaaaaaeaaaaapiaalaaoekaaaaaaajaaaaaoeiaaeaaaaaeaaaaapiaanaaoeka
+aaaakkjaaaaaoeiaaeaaaaaeaaaaapiaaoaaoekaaaaappjaaaaaoeiaafaaaaad
+abaaabiaaaaaffiaadaaaakaafaaaaadabaaaiiaabaaaaiabgaaaakaafaaaaad
+abaaafiaaaaapeiabgaaaakaacaaaaadacaaadoaabaakkiaabaaomiaafaaaaad
+abaaabiaacaaaajabdaaaakaafaaaaadabaaaciaacaaaajabeaaaakaafaaaaad
+abaaaeiaacaaaajabfaaaakaafaaaaadacaaabiaacaaffjabdaaffkaafaaaaad
+acaaaciaacaaffjabeaaffkaafaaaaadacaaaeiaacaaffjabfaaffkaacaaaaad
+abaaahiaabaaoeiaacaaoeiaafaaaaadacaaabiaacaakkjabdaakkkaafaaaaad
+acaaaciaacaakkjabeaakkkaafaaaaadacaaaeiaacaakkjabfaakkkaacaaaaad
+abaaahiaabaaoeiaacaaoeiaceaaaaacacaaahiaabaaoeiaafaaaaadabaaabia
+acaaffiaacaaffiaaeaaaaaeabaaabiaacaaaaiaacaaaaiaabaaaaibafaaaaad
+adaaapiaacaacjiaacaakeiaajaaaaadaeaaabiaahaaoekaadaaoeiaajaaaaad
+aeaaaciaaiaaoekaadaaoeiaajaaaaadaeaaaeiaajaaoekaadaaoeiaaeaaaaae
+abaaahiaakaaoekaabaaaaiaaeaaoeiaabaaaaacacaaaiiabgaaffkaajaaaaad
+adaaabiaaeaaoekaacaaoeiaajaaaaadadaaaciaafaaoekaacaaoeiaajaaaaad
+adaaaeiaagaaoekaacaaoeiaacaaaaadaeaaahoaabaaoeiaadaaoeiaaeaaaaae
+aaaaadmaaaaappiaaaaaoekaaaaaoeiaabaaaaacaaaaammaaaaaoeiaabaaaaac
+acaaamoaaaaaoeiaabaaaaacadaaapoabgaakkkappppaaaafdeieefcbeagaaaa
+eaaaabaaifabaaaafjaaaaaeegiocaaaaaaaaaaaamaaaaaafjaaaaaeegiocaaa
+abaaaaaaagaaaaaafjaaaaaeegiocaaaacaaaaaacnaaaaaafjaaaaaeegiocaaa
+adaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaa
+fpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaad
+pccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadpccabaaaadaaaaaa
+gfaaaaadpccabaaaaeaaaaaagfaaaaadhccabaaaafaaaaaagiaaaaacaeaaaaaa
+diaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaadaaaaaaabaaaaaa
+dcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaaaaaaaaaaagbabaaaaaaaaaaa
+egaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaaacaaaaaa
+kgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaa
+adaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadgaaaaafpccabaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaa
+egiacaaaaaaaaaaaakaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaalmccabaaa
+abaaaaaaagbebaaaadaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaaaaaaaaaa
+alaaaaaadiaaaaaihcaabaaaabaaaaaafgbfbaaaaaaaaaaaegiccaaaadaaaaaa
+anaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaadaaaaaaamaaaaaaagbabaaa
+aaaaaaaaegacbaaaabaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaadaaaaaa
+aoaaaaaakgbkbaaaaaaaaaaaegacbaaaabaaaaaadcaaaaakhccabaaaacaaaaaa
+egiccaaaadaaaaaaapaaaaaapgbpbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaai
+ccaabaaaaaaaaaaabkaabaaaaaaaaaaaakiacaaaabaaaaaaafaaaaaadiaaaaak
+ncaabaaaabaaaaaaagahbaaaaaaaaaaaaceaaaaaaaaaaadpaaaaaaaaaaaaaadp
+aaaaaadpdgaaaaafmccabaaaadaaaaaakgaobaaaaaaaaaaaaaaaaaahdccabaaa
+adaaaaaakgakbaaaabaaaaaamgaabaaaabaaaaaadgaaaaaipccabaaaaeaaaaaa
+aceaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadiaaaaaibcaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaadaaaaaabaaaaaaadiaaaaaiccaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaadaaaaaabbaaaaaadiaaaaaiecaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaadaaaaaabcaaaaaadiaaaaaibcaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaadaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaadaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaadaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaa
+egacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaaibcaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaadaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaadaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaadaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaa
+aaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaaaaaaaaaa
+egacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaadiaaaaah
+hcaabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadiaaaaahbcaabaaa
+abaaaaaabkaabaaaaaaaaaaabkaabaaaaaaaaaaadcaaaaakbcaabaaaabaaaaaa
+akaabaaaaaaaaaaaakaabaaaaaaaaaaaakaabaiaebaaaaaaabaaaaaadiaaaaah
+pcaabaaaacaaaaaajgacbaaaaaaaaaaaegakbaaaaaaaaaaabbaaaaaibcaabaaa
+adaaaaaaegiocaaaacaaaaaacjaaaaaaegaobaaaacaaaaaabbaaaaaiccaabaaa
+adaaaaaaegiocaaaacaaaaaackaaaaaaegaobaaaacaaaaaabbaaaaaiecaabaaa
+adaaaaaaegiocaaaacaaaaaaclaaaaaaegaobaaaacaaaaaadcaaaaakhcaabaaa
+abaaaaaaegiccaaaacaaaaaacmaaaaaaagaabaaaabaaaaaaegacbaaaadaaaaaa
+dgaaaaaficaabaaaaaaaaaaaabeaaaaaaaaaiadpbbaaaaaibcaabaaaacaaaaaa
+egiocaaaacaaaaaacgaaaaaaegaobaaaaaaaaaaabbaaaaaiccaabaaaacaaaaaa
+egiocaaaacaaaaaachaaaaaaegaobaaaaaaaaaaabbaaaaaiecaabaaaacaaaaaa
+egiocaaaacaaaaaaciaaaaaaegaobaaaaaaaaaaaaaaaaaahhccabaaaafaaaaaa
+egacbaaaabaaaaaaegacbaaaacaaaaaadoaaaaabejfdeheopaaaaaaaaiaaaaaa
+aiaaaaaamiaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaacaaaaaaahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaa
+apadaaaaoaaaaaaaabaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaa
+adaaaaaaagaaaaaaapaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaa
+apaaaaaafaepfdejfeejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffied
+epepfceeaaedepemepfcaaklepfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahaiaaaakeaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaapaaaaaakeaaaaaa
+adaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaakeaaaaaaaeaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfcee
+aaklklkl"
+}
+SubProgram "d3d9 " {
+// Stats: 34 math
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "UNITY_HDR_ON" }
+Bind "vertex" Vertex
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+Matrix 4 [_Object2World] 3
+Matrix 7 [_World2Object] 3
+Matrix 0 [glstate_matrix_mvp]
+Vector 20 [_Illum_ST]
+Vector 19 [_MainTex_ST]
+Vector 10 [_ProjectionParams]
+Vector 11 [_ScreenParams]
+Vector 14 [unity_SHAb]
+Vector 13 [unity_SHAg]
+Vector 12 [unity_SHAr]
+Vector 17 [unity_SHBb]
+Vector 16 [unity_SHBg]
+Vector 15 [unity_SHBr]
+Vector 18 [unity_SHC]
+"vs_2_0
+def c21, 0.5, 1, 0, 0
+dcl_position v0
+dcl_normal v1
+dcl_texcoord v2
+mad oT0.xy, v2, c19, c19.zwzw
+mad oT0.zw, v2.xyxy, c20.xyxy, c20
+dp4 oT1.x, c4, v0
+dp4 oT1.y, c5, v0
+dp4 oT1.z, c6, v0
+dp4 r0.y, c1, v0
+mul r1.x, r0.y, c10.x
+mul r1.w, r1.x, c21.x
+dp4 r0.x, c0, v0
+dp4 r0.w, c3, v0
+mul r1.xz, r0.xyww, c21.x
+mad oT2.xy, r1.z, c11.zwzw, r1.xwzw
+mul r1.xyz, v1.y, c8
+mad r1.xyz, c7, v1.x, r1
+mad r1.xyz, c9, v1.z, r1
+nrm r2.xyz, r1
+mul r1.x, r2.y, r2.y
+mad r1.x, r2.x, r2.x, -r1.x
+mul r3, r2.yzzx, r2.xyzz
+dp4 r4.x, c15, r3
+dp4 r4.y, c16, r3
+dp4 r4.z, c17, r3
+mad r1.xyz, c18, r1.x, r4
+mov r2.w, c21.y
+dp4 r3.x, c12, r2
+dp4 r3.y, c13, r2
+dp4 r3.z, c14, r2
+add oT4.xyz, r1, r3
+dp4 r0.z, c2, v0
+mov oPos, r0
+mov oT2.zw, r0
+mov oT3, c21.z
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 38 math
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "UNITY_HDR_ON" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 208
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityPerCamera" 144
+Vector 80 [_ProjectionParams]
+ConstBuffer "UnityLighting" 720
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerCamera" 1
+BindCB  "UnityLighting" 2
+BindCB  "UnityPerDraw" 3
+"vs_4_0
+root12:aaaeaaaa
+eefieceddkegmedicbhpghalankilincjcceegagabaaaaaapiahaaaaadaaaaaa
+cmaaaaaaceabaaaanmabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+apaaaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaakeaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaapaaaaaakeaaaaaaadaaaaaaaaaaaaaa
+adaaaaaaaeaaaaaaapaaaaaakeaaaaaaaeaaaaaaaaaaaaaaadaaaaaaafaaaaaa
+ahaiaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklklfdeieefc
+beagaaaaeaaaabaaifabaaaafjaaaaaeegiocaaaaaaaaaaaamaaaaaafjaaaaae
+egiocaaaabaaaaaaagaaaaaafjaaaaaeegiocaaaacaaaaaacnaaaaaafjaaaaae
+egiocaaaadaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaa
+acaaaaaafpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaa
+gfaaaaadpccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadpccabaaa
+adaaaaaagfaaaaadpccabaaaaeaaaaaagfaaaaadhccabaaaafaaaaaagiaaaaac
+aeaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaadaaaaaa
+abaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaaaaaaaaaaagbabaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaa
+acaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaa
+egiocaaaadaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadgaaaaaf
+pccabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaa
+adaaaaaaegiacaaaaaaaaaaaakaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaal
+mccabaaaabaaaaaaagbebaaaadaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaa
+aaaaaaaaalaaaaaadiaaaaaihcaabaaaabaaaaaafgbfbaaaaaaaaaaaegiccaaa
+adaaaaaaanaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaadaaaaaaamaaaaaa
+agbabaaaaaaaaaaaegacbaaaabaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaa
+adaaaaaaaoaaaaaakgbkbaaaaaaaaaaaegacbaaaabaaaaaadcaaaaakhccabaaa
+acaaaaaaegiccaaaadaaaaaaapaaaaaapgbpbaaaaaaaaaaaegacbaaaabaaaaaa
+diaaaaaiccaabaaaaaaaaaaabkaabaaaaaaaaaaaakiacaaaabaaaaaaafaaaaaa
+diaaaaakncaabaaaabaaaaaaagahbaaaaaaaaaaaaceaaaaaaaaaaadpaaaaaaaa
+aaaaaadpaaaaaadpdgaaaaafmccabaaaadaaaaaakgaobaaaaaaaaaaaaaaaaaah
+dccabaaaadaaaaaakgakbaaaabaaaaaamgaabaaaabaaaaaadgaaaaaipccabaaa
+aeaaaaaaaceaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadiaaaaaibcaabaaa
+aaaaaaaaakbabaaaacaaaaaaakiacaaaadaaaaaabaaaaaaadiaaaaaiccaabaaa
+aaaaaaaaakbabaaaacaaaaaaakiacaaaadaaaaaabbaaaaaadiaaaaaiecaabaaa
+aaaaaaaaakbabaaaacaaaaaaakiacaaaadaaaaaabcaaaaaadiaaaaaibcaabaaa
+abaaaaaabkbabaaaacaaaaaabkiacaaaadaaaaaabaaaaaaadiaaaaaiccaabaaa
+abaaaaaabkbabaaaacaaaaaabkiacaaaadaaaaaabbaaaaaadiaaaaaiecaabaaa
+abaaaaaabkbabaaaacaaaaaabkiacaaaadaaaaaabcaaaaaaaaaaaaahhcaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaaibcaabaaaabaaaaaa
+ckbabaaaacaaaaaackiacaaaadaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaa
+ckbabaaaacaaaaaackiacaaaadaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaa
+ckbabaaaacaaaaaackiacaaaadaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaa
+egacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaa
+aaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaa
+diaaaaahhcaabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadiaaaaah
+bcaabaaaabaaaaaabkaabaaaaaaaaaaabkaabaaaaaaaaaaadcaaaaakbcaabaaa
+abaaaaaaakaabaaaaaaaaaaaakaabaaaaaaaaaaaakaabaiaebaaaaaaabaaaaaa
+diaaaaahpcaabaaaacaaaaaajgacbaaaaaaaaaaaegakbaaaaaaaaaaabbaaaaai
+bcaabaaaadaaaaaaegiocaaaacaaaaaacjaaaaaaegaobaaaacaaaaaabbaaaaai
+ccaabaaaadaaaaaaegiocaaaacaaaaaackaaaaaaegaobaaaacaaaaaabbaaaaai
+ecaabaaaadaaaaaaegiocaaaacaaaaaaclaaaaaaegaobaaaacaaaaaadcaaaaak
+hcaabaaaabaaaaaaegiccaaaacaaaaaacmaaaaaaagaabaaaabaaaaaaegacbaaa
+adaaaaaadgaaaaaficaabaaaaaaaaaaaabeaaaaaaaaaiadpbbaaaaaibcaabaaa
+acaaaaaaegiocaaaacaaaaaacgaaaaaaegaobaaaaaaaaaaabbaaaaaiccaabaaa
+acaaaaaaegiocaaaacaaaaaachaaaaaaegaobaaaaaaaaaaabbaaaaaiecaabaaa
+acaaaaaaegiocaaaacaaaaaaciaaaaaaegaobaaaaaaaaaaaaaaaaaahhccabaaa
+afaaaaaaegacbaaaabaaaaaaegacbaaaacaaaaaadoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 38 math
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "UNITY_HDR_ON" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 208
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityPerCamera" 144
+Vector 80 [_ProjectionParams]
+ConstBuffer "UnityLighting" 720
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityPerCamera" 1
+BindCB  "UnityLighting" 2
+BindCB  "UnityPerDraw" 3
+"vs_4_0_level_9_1
+root12:aaaeaaaa
+eefiecedgjamnnafkjifjdbemjieojplgpococpoabaaaaaagealaaaaaeaaaaaa
+daaaaaaajiadaaaaleajaaaakmakaaaaebgpgodjgaadaaaagaadaaaaaaacpopp
+pmacaaaageaaaaaaafaaceaaaaaagaaaaaaagaaaaaaaceaaabaagaaaaaaaakaa
+acaaabaaaaaaaaaaabaaafaaabaaadaaaaaaaaaaacaacgaaahaaaeaaaaaaaaaa
+adaaaaaaaeaaalaaaaaaaaaaadaaamaaahaaapaaaaaaaaaaaaaaaaaaaaacpopp
+fbaaaaafbgaaapkaaaaaaadpaaaaiadpaaaaaaaaaaaaaaaabpaaaaacafaaaaia
+aaaaapjabpaaaaacafaaaciaacaaapjabpaaaaacafaaadiaadaaapjaaeaaaaae
+aaaaadoaadaaoejaabaaoekaabaaookaaeaaaaaeaaaaamoaadaaeejaacaaeeka
+acaaoekaafaaaaadaaaaahiaaaaaffjabaaaoekaaeaaaaaeaaaaahiaapaaoeka
+aaaaaajaaaaaoeiaaeaaaaaeaaaaahiabbaaoekaaaaakkjaaaaaoeiaaeaaaaae
+abaaahoabcaaoekaaaaappjaaaaaoeiaafaaaaadaaaaapiaaaaaffjaamaaoeka
+aeaaaaaeaaaaapiaalaaoekaaaaaaajaaaaaoeiaaeaaaaaeaaaaapiaanaaoeka
+aaaakkjaaaaaoeiaaeaaaaaeaaaaapiaaoaaoekaaaaappjaaaaaoeiaafaaaaad
+abaaabiaaaaaffiaadaaaakaafaaaaadabaaaiiaabaaaaiabgaaaakaafaaaaad
+abaaafiaaaaapeiabgaaaakaacaaaaadacaaadoaabaakkiaabaaomiaafaaaaad
+abaaabiaacaaaajabdaaaakaafaaaaadabaaaciaacaaaajabeaaaakaafaaaaad
+abaaaeiaacaaaajabfaaaakaafaaaaadacaaabiaacaaffjabdaaffkaafaaaaad
+acaaaciaacaaffjabeaaffkaafaaaaadacaaaeiaacaaffjabfaaffkaacaaaaad
+abaaahiaabaaoeiaacaaoeiaafaaaaadacaaabiaacaakkjabdaakkkaafaaaaad
+acaaaciaacaakkjabeaakkkaafaaaaadacaaaeiaacaakkjabfaakkkaacaaaaad
+abaaahiaabaaoeiaacaaoeiaceaaaaacacaaahiaabaaoeiaafaaaaadabaaabia
+acaaffiaacaaffiaaeaaaaaeabaaabiaacaaaaiaacaaaaiaabaaaaibafaaaaad
+adaaapiaacaacjiaacaakeiaajaaaaadaeaaabiaahaaoekaadaaoeiaajaaaaad
+aeaaaciaaiaaoekaadaaoeiaajaaaaadaeaaaeiaajaaoekaadaaoeiaaeaaaaae
+abaaahiaakaaoekaabaaaaiaaeaaoeiaabaaaaacacaaaiiabgaaffkaajaaaaad
+adaaabiaaeaaoekaacaaoeiaajaaaaadadaaaciaafaaoekaacaaoeiaajaaaaad
+adaaaeiaagaaoekaacaaoeiaacaaaaadaeaaahoaabaaoeiaadaaoeiaaeaaaaae
+aaaaadmaaaaappiaaaaaoekaaaaaoeiaabaaaaacaaaaammaaaaaoeiaabaaaaac
+acaaamoaaaaaoeiaabaaaaacadaaapoabgaakkkappppaaaafdeieefcbeagaaaa
+eaaaabaaifabaaaafjaaaaaeegiocaaaaaaaaaaaamaaaaaafjaaaaaeegiocaaa
+abaaaaaaagaaaaaafjaaaaaeegiocaaaacaaaaaacnaaaaaafjaaaaaeegiocaaa
+adaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaa
+fpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaad
+pccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadpccabaaaadaaaaaa
+gfaaaaadpccabaaaaeaaaaaagfaaaaadhccabaaaafaaaaaagiaaaaacaeaaaaaa
+diaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaadaaaaaaabaaaaaa
+dcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaaaaaaaaaaagbabaaaaaaaaaaa
+egaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaadaaaaaaacaaaaaa
+kgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaa
+adaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadgaaaaafpccabaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaa
+egiacaaaaaaaaaaaakaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaalmccabaaa
+abaaaaaaagbebaaaadaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaaaaaaaaaa
+alaaaaaadiaaaaaihcaabaaaabaaaaaafgbfbaaaaaaaaaaaegiccaaaadaaaaaa
+anaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaadaaaaaaamaaaaaaagbabaaa
+aaaaaaaaegacbaaaabaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaadaaaaaa
+aoaaaaaakgbkbaaaaaaaaaaaegacbaaaabaaaaaadcaaaaakhccabaaaacaaaaaa
+egiccaaaadaaaaaaapaaaaaapgbpbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaai
+ccaabaaaaaaaaaaabkaabaaaaaaaaaaaakiacaaaabaaaaaaafaaaaaadiaaaaak
+ncaabaaaabaaaaaaagahbaaaaaaaaaaaaceaaaaaaaaaaadpaaaaaaaaaaaaaadp
+aaaaaadpdgaaaaafmccabaaaadaaaaaakgaobaaaaaaaaaaaaaaaaaahdccabaaa
+adaaaaaakgakbaaaabaaaaaamgaabaaaabaaaaaadgaaaaaipccabaaaaeaaaaaa
+aceaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadiaaaaaibcaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaadaaaaaabaaaaaaadiaaaaaiccaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaadaaaaaabbaaaaaadiaaaaaiecaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaadaaaaaabcaaaaaadiaaaaaibcaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaadaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaadaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaadaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaa
+egacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaaibcaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaadaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaadaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaadaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaa
+aaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaaaaaaaaaa
+egacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaadiaaaaah
+hcaabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadiaaaaahbcaabaaa
+abaaaaaabkaabaaaaaaaaaaabkaabaaaaaaaaaaadcaaaaakbcaabaaaabaaaaaa
+akaabaaaaaaaaaaaakaabaaaaaaaaaaaakaabaiaebaaaaaaabaaaaaadiaaaaah
+pcaabaaaacaaaaaajgacbaaaaaaaaaaaegakbaaaaaaaaaaabbaaaaaibcaabaaa
+adaaaaaaegiocaaaacaaaaaacjaaaaaaegaobaaaacaaaaaabbaaaaaiccaabaaa
+adaaaaaaegiocaaaacaaaaaackaaaaaaegaobaaaacaaaaaabbaaaaaiecaabaaa
+adaaaaaaegiocaaaacaaaaaaclaaaaaaegaobaaaacaaaaaadcaaaaakhcaabaaa
+abaaaaaaegiccaaaacaaaaaacmaaaaaaagaabaaaabaaaaaaegacbaaaadaaaaaa
+dgaaaaaficaabaaaaaaaaaaaabeaaaaaaaaaiadpbbaaaaaibcaabaaaacaaaaaa
+egiocaaaacaaaaaacgaaaaaaegaobaaaaaaaaaaabbaaaaaiccaabaaaacaaaaaa
+egiocaaaacaaaaaachaaaaaaegaobaaaaaaaaaaabbaaaaaiecaabaaaacaaaaaa
+egiocaaaacaaaaaaciaaaaaaegaobaaaaaaaaaaaaaaaaaahhccabaaaafaaaaaa
+egacbaaaabaaaaaaegacbaaaacaaaaaadoaaaaabejfdeheopaaaaaaaaiaaaaaa
+aiaaaaaamiaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaacaaaaaaahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaa
+apadaaaaoaaaaaaaabaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaa
+adaaaaaaagaaaaaaapaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaa
+apaaaaaafaepfdejfeejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffied
+epepfceeaaedepemepfcaaklepfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahaiaaaakeaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaapaaaaaakeaaaaaa
+adaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaakeaaaaaaaeaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaahaiaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfcee
+aaklklkl"
+}
+}
+Program "fp" {
+SubProgram "d3d9 " {
+// Stats: 11 math, 3 textures
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "HDR_LIGHT_PREPASS_OFF" }
+Vector 0 [_Color]
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+SetTexture 2 [_LightBuffer] 2D 2
+"ps_2_0
+def c1, 1, 0, 0, 0
+dcl t0
+dcl t2
+dcl t4.xyz
+dcl_2d s0
+dcl_2d s1
+dcl_2d s2
+texldp_pp r0, t2, s2
+texld_pp r1, t0, s0
+log_pp r2.x, r0.x
+log_pp r2.y, r0.y
+log_pp r2.z, r0.z
+add_pp r0.xyz, -r2, t4
+mov r2.x, t0.z
+mov r2.y, t0.w
+texld r2, r2, s1
+mul_pp r1.xyz, r1, c0
+mul_pp r2.xyz, r2.w, r1
+mad_pp r0.xyz, r1, r0, r2
+mov_pp r0.w, c1.x
+mov_pp oC0, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 6 math, 3 textures
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "HDR_LIGHT_PREPASS_OFF" }
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+SetTexture 2 [_LightBuffer] 2D 2
+ConstBuffer "$Globals" 208
+Vector 144 [_Color]
+BindCB  "$Globals" 0
+"ps_4_0
+root12:adabadaa
+eefiecedcbecfhgligjpdjhmelmiabenomlcfbijabaaaaaapiacaaaaadaaaaaa
+cmaaaaaaoeaaaaaabiabaaaaejfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapapaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahaaaaaakeaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaapalaaaakeaaaaaa
+adaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaakeaaaaaaaeaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaahahaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfcee
+aaklklklepfdeheocmaaaaaaabaaaaaaaiaaaaaacaaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaaaaaaaaaapaaaaaafdfgfpfegbhcghgfheaaklklfdeieefcniabaaaa
+eaaaaaaahgaaaaaafjaaaaaeegiocaaaaaaaaaaaakaaaaaafkaaaaadaagabaaa
+aaaaaaaafkaaaaadaagabaaaabaaaaaafkaaaaadaagabaaaacaaaaaafibiaaae
+aahabaaaaaaaaaaaffffaaaafibiaaaeaahabaaaabaaaaaaffffaaaafibiaaae
+aahabaaaacaaaaaaffffaaaagcbaaaadpcbabaaaabaaaaaagcbaaaadlcbabaaa
+adaaaaaagcbaaaadhcbabaaaafaaaaaagfaaaaadpccabaaaaaaaaaaagiaaaaac
+adaaaaaaaoaaaaahdcaabaaaaaaaaaaaegbabaaaadaaaaaapgbpbaaaadaaaaaa
+efaaaaajpcaabaaaaaaaaaaaegaabaaaaaaaaaaaeghobaaaacaaaaaaaagabaaa
+acaaaaaacpaaaaafhcaabaaaaaaaaaaaegacbaaaaaaaaaaaaaaaaaaihcaabaaa
+aaaaaaaaegacbaiaebaaaaaaaaaaaaaaegbcbaaaafaaaaaaefaaaaajpcaabaaa
+abaaaaaaogbkbaaaabaaaaaaeghobaaaabaaaaaaaagabaaaabaaaaaaefaaaaaj
+pcaabaaaacaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaaaaaaaaaa
+diaaaaaihcaabaaaabaaaaaaegacbaaaacaaaaaaegiccaaaaaaaaaaaajaaaaaa
+diaaaaahhcaabaaaacaaaaaapgapbaaaabaaaaaaegacbaaaabaaaaaadcaaaaaj
+hccabaaaaaaaaaaaegacbaaaabaaaaaaegacbaaaaaaaaaaaegacbaaaacaaaaaa
+dgaaaaaficcabaaaaaaaaaaaabeaaaaaaaaaiadpdoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 6 math, 3 textures
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "HDR_LIGHT_PREPASS_OFF" }
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+SetTexture 2 [_LightBuffer] 2D 2
+ConstBuffer "$Globals" 208
+Vector 144 [_Color]
+BindCB  "$Globals" 0
+"ps_4_0_level_9_1
+root12:adabadaa
+eefiecedkobbcnkgfelejooikpdmmgobcnmmadgdabaaaaaaimaeaaaaaeaaaaaa
+daaaaaaamaabaaaakaadaaaafiaeaaaaebgpgodjiiabaaaaiiabaaaaaaacpppp
+emabaaaadmaaaaaaabaadaaaaaaadmaaaaaadmaaadaaceaaaaaadmaaaaaaaaaa
+abababaaacacacaaaaaaajaaabaaaaaaaaaaaaaaaaacppppfbaaaaafabaaapka
+aaaaiadpaaaaaaaaaaaaaaaaaaaaaaaabpaaaaacaaaaaaiaaaaaaplabpaaaaac
+aaaaaaiaacaaaplabpaaaaacaaaaaaiaaeaaahlabpaaaaacaaaaaajaaaaiapka
+bpaaaaacaaaaaajaabaiapkabpaaaaacaaaaaajaacaiapkaagaaaaacaaaaaiia
+acaapplaafaaaaadaaaaadiaaaaappiaacaaoelaabaaaaacabaaabiaaaaakkla
+abaaaaacabaaaciaaaaapplaecaaaaadaaaacpiaaaaaoeiaacaioekaecaaaaad
+abaaapiaabaaoeiaabaioekaecaaaaadacaacpiaaaaaoelaaaaioekaapaaaaac
+abaacbiaaaaaaaiaapaaaaacabaacciaaaaaffiaapaaaaacabaaceiaaaaakkia
+acaaaaadaaaachiaabaaoeibaeaaoelaafaaaaadabaachiaacaaoeiaaaaaoeka
+afaaaaadacaachiaabaappiaabaaoeiaaeaaaaaeaaaachiaabaaoeiaaaaaoeia
+acaaoeiaabaaaaacaaaaciiaabaaaakaabaaaaacaaaicpiaaaaaoeiappppaaaa
+fdeieefcniabaaaaeaaaaaaahgaaaaaafjaaaaaeegiocaaaaaaaaaaaakaaaaaa
+fkaaaaadaagabaaaaaaaaaaafkaaaaadaagabaaaabaaaaaafkaaaaadaagabaaa
+acaaaaaafibiaaaeaahabaaaaaaaaaaaffffaaaafibiaaaeaahabaaaabaaaaaa
+ffffaaaafibiaaaeaahabaaaacaaaaaaffffaaaagcbaaaadpcbabaaaabaaaaaa
+gcbaaaadlcbabaaaadaaaaaagcbaaaadhcbabaaaafaaaaaagfaaaaadpccabaaa
+aaaaaaaagiaaaaacadaaaaaaaoaaaaahdcaabaaaaaaaaaaaegbabaaaadaaaaaa
+pgbpbaaaadaaaaaaefaaaaajpcaabaaaaaaaaaaaegaabaaaaaaaaaaaeghobaaa
+acaaaaaaaagabaaaacaaaaaacpaaaaafhcaabaaaaaaaaaaaegacbaaaaaaaaaaa
+aaaaaaaihcaabaaaaaaaaaaaegacbaiaebaaaaaaaaaaaaaaegbcbaaaafaaaaaa
+efaaaaajpcaabaaaabaaaaaaogbkbaaaabaaaaaaeghobaaaabaaaaaaaagabaaa
+abaaaaaaefaaaaajpcaabaaaacaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaa
+aagabaaaaaaaaaaadiaaaaaihcaabaaaabaaaaaaegacbaaaacaaaaaaegiccaaa
+aaaaaaaaajaaaaaadiaaaaahhcaabaaaacaaaaaapgapbaaaabaaaaaaegacbaaa
+abaaaaaadcaaaaajhccabaaaaaaaaaaaegacbaaaabaaaaaaegacbaaaaaaaaaaa
+egacbaaaacaaaaaadgaaaaaficcabaaaaaaaaaaaabeaaaaaaaaaiadpdoaaaaab
+ejfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaaaaaaaaaaabaaaaaaadaaaaaa
+aaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapapaaaa
+keaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaaaaaakeaaaaaaacaaaaaa
+aaaaaaaaadaaaaaaadaaaaaaapalaaaakeaaaaaaadaaaaaaaaaaaaaaadaaaaaa
+aeaaaaaaapaaaaaakeaaaaaaaeaaaaaaaaaaaaaaadaaaaaaafaaaaaaahahaaaa
+fdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklklepfdeheocmaaaaaa
+abaaaaaaaiaaaaaacaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapaaaaaa
+fdfgfpfegbhcghgfheaaklkl"
+}
+SubProgram "d3d9 " {
+// Stats: 8 math, 3 textures
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "UNITY_HDR_ON" }
+Vector 0 [_Color]
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+SetTexture 2 [_LightBuffer] 2D 2
+"ps_2_0
+def c1, 1, 0, 0, 0
+dcl t0
+dcl t2
+dcl t4.xyz
+dcl_2d s0
+dcl_2d s1
+dcl_2d s2
+mov r0.x, t0.z
+mov r0.y, t0.w
+texld r0, r0, s1
+texld_pp r1, t0, s0
+texldp_pp r2, t2, s2
+mul_pp r0.xyz, r1, c0
+mul_pp r1.xyz, r0.w, r0
+add_pp r2.xyz, r2, t4
+mad_pp r0.xyz, r0, r2, r1
+mov_pp r0.w, c1.x
+mov_pp oC0, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 5 math, 3 textures
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "UNITY_HDR_ON" }
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+SetTexture 2 [_LightBuffer] 2D 2
+ConstBuffer "$Globals" 208
+Vector 144 [_Color]
+BindCB  "$Globals" 0
+"ps_4_0
+root12:adabadaa
+eefiecedpbocgfggepfjmciodehpchjddghmgnljabaaaaaaoaacaaaaadaaaaaa
+cmaaaaaaoeaaaaaabiabaaaaejfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapapaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahaaaaaakeaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaapalaaaakeaaaaaa
+adaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaakeaaaaaaaeaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaahahaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfcee
+aaklklklepfdeheocmaaaaaaabaaaaaaaiaaaaaacaaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaaaaaaaaaapaaaaaafdfgfpfegbhcghgfheaaklklfdeieefcmaabaaaa
+eaaaaaaahaaaaaaafjaaaaaeegiocaaaaaaaaaaaakaaaaaafkaaaaadaagabaaa
+aaaaaaaafkaaaaadaagabaaaabaaaaaafkaaaaadaagabaaaacaaaaaafibiaaae
+aahabaaaaaaaaaaaffffaaaafibiaaaeaahabaaaabaaaaaaffffaaaafibiaaae
+aahabaaaacaaaaaaffffaaaagcbaaaadpcbabaaaabaaaaaagcbaaaadlcbabaaa
+adaaaaaagcbaaaadhcbabaaaafaaaaaagfaaaaadpccabaaaaaaaaaaagiaaaaac
+adaaaaaaaoaaaaahdcaabaaaaaaaaaaaegbabaaaadaaaaaapgbpbaaaadaaaaaa
+efaaaaajpcaabaaaaaaaaaaaegaabaaaaaaaaaaaeghobaaaacaaaaaaaagabaaa
+acaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegbcbaaaafaaaaaa
+efaaaaajpcaabaaaabaaaaaaogbkbaaaabaaaaaaeghobaaaabaaaaaaaagabaaa
+abaaaaaaefaaaaajpcaabaaaacaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaa
+aagabaaaaaaaaaaadiaaaaaihcaabaaaabaaaaaaegacbaaaacaaaaaaegiccaaa
+aaaaaaaaajaaaaaadiaaaaahhcaabaaaacaaaaaapgapbaaaabaaaaaaegacbaaa
+abaaaaaadcaaaaajhccabaaaaaaaaaaaegacbaaaabaaaaaaegacbaaaaaaaaaaa
+egacbaaaacaaaaaadgaaaaaficcabaaaaaaaaaaaabeaaaaaaaaaiadpdoaaaaab
+"
+}
+SubProgram "d3d11_9x " {
+// Stats: 5 math, 3 textures
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "UNITY_HDR_ON" }
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+SetTexture 2 [_LightBuffer] 2D 2
+ConstBuffer "$Globals" 208
+Vector 144 [_Color]
+BindCB  "$Globals" 0
+"ps_4_0_level_9_1
+root12:adabadaa
+eefieceddbfbafcoocehcjpfhgmjnikkcaimhmhdabaaaaaafaaeaaaaaeaaaaaa
+daaaaaaajmabaaaageadaaaabmaeaaaaebgpgodjgeabaaaageabaaaaaaacpppp
+ciabaaaadmaaaaaaabaadaaaaaaadmaaaaaadmaaadaaceaaaaaadmaaaaaaaaaa
+abababaaacacacaaaaaaajaaabaaaaaaaaaaaaaaaaacppppfbaaaaafabaaapka
+aaaaiadpaaaaaaaaaaaaaaaaaaaaaaaabpaaaaacaaaaaaiaaaaaaplabpaaaaac
+aaaaaaiaacaaaplabpaaaaacaaaaaaiaaeaaahlabpaaaaacaaaaaajaaaaiapka
+bpaaaaacaaaaaajaabaiapkabpaaaaacaaaaaajaacaiapkaagaaaaacaaaaaiia
+acaapplaafaaaaadaaaaadiaaaaappiaacaaoelaabaaaaacabaaabiaaaaakkla
+abaaaaacabaaaciaaaaapplaecaaaaadaaaacpiaaaaaoeiaacaioekaecaaaaad
+abaaapiaabaaoeiaabaioekaecaaaaadacaacpiaaaaaoelaaaaioekaacaaaaad
+aaaachiaaaaaoeiaaeaaoelaafaaaaadabaachiaacaaoeiaaaaaoekaafaaaaad
+acaachiaabaappiaabaaoeiaaeaaaaaeaaaachiaabaaoeiaaaaaoeiaacaaoeia
+abaaaaacaaaaciiaabaaaakaabaaaaacaaaicpiaaaaaoeiappppaaaafdeieefc
+maabaaaaeaaaaaaahaaaaaaafjaaaaaeegiocaaaaaaaaaaaakaaaaaafkaaaaad
+aagabaaaaaaaaaaafkaaaaadaagabaaaabaaaaaafkaaaaadaagabaaaacaaaaaa
+fibiaaaeaahabaaaaaaaaaaaffffaaaafibiaaaeaahabaaaabaaaaaaffffaaaa
+fibiaaaeaahabaaaacaaaaaaffffaaaagcbaaaadpcbabaaaabaaaaaagcbaaaad
+lcbabaaaadaaaaaagcbaaaadhcbabaaaafaaaaaagfaaaaadpccabaaaaaaaaaaa
+giaaaaacadaaaaaaaoaaaaahdcaabaaaaaaaaaaaegbabaaaadaaaaaapgbpbaaa
+adaaaaaaefaaaaajpcaabaaaaaaaaaaaegaabaaaaaaaaaaaeghobaaaacaaaaaa
+aagabaaaacaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegbcbaaa
+afaaaaaaefaaaaajpcaabaaaabaaaaaaogbkbaaaabaaaaaaeghobaaaabaaaaaa
+aagabaaaabaaaaaaefaaaaajpcaabaaaacaaaaaaegbabaaaabaaaaaaeghobaaa
+aaaaaaaaaagabaaaaaaaaaaadiaaaaaihcaabaaaabaaaaaaegacbaaaacaaaaaa
+egiccaaaaaaaaaaaajaaaaaadiaaaaahhcaabaaaacaaaaaapgapbaaaabaaaaaa
+egacbaaaabaaaaaadcaaaaajhccabaaaaaaaaaaaegacbaaaabaaaaaaegacbaaa
+aaaaaaaaegacbaaaacaaaaaadgaaaaaficcabaaaaaaaaaaaabeaaaaaaaaaiadp
+doaaaaabejfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+apapaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaaaaaakeaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaapalaaaakeaaaaaaadaaaaaaaaaaaaaa
+adaaaaaaaeaaaaaaapaaaaaakeaaaaaaaeaaaaaaaaaaaaaaadaaaaaaafaaaaaa
+ahahaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklklepfdeheo
+cmaaaaaaabaaaaaaaiaaaaaacaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaa
+apaaaaaafdfgfpfegbhcghgfheaaklkl"
+}
+}
+ }
+
+
+ // Stats for Vertex shader:
+ //       d3d11 : 35 math
+ //    d3d11_9x : 35 math
+ //        d3d9 : 29 math
+ // Stats for Fragment shader:
+ //       d3d11 : 4 avg math (4..5), 2 texture
+ //    d3d11_9x : 4 avg math (4..5), 2 texture
+ //        d3d9 : 15 avg math (14..17), 2 texture
+ Pass {
+  Name "DEFERRED"
+  Tags { "LIGHTMODE"="Deferred" "RenderType"="Opaque" }
+  GpuProgramID 316301
+Program "vp" {
+SubProgram "d3d9 " {
+// Stats: 29 math
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "HDR_LIGHT_PREPASS_OFF" }
+Bind "vertex" Vertex
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+Matrix 4 [_Object2World] 3
+Matrix 7 [_World2Object] 3
+Matrix 0 [glstate_matrix_mvp]
+Vector 18 [_Illum_ST]
+Vector 17 [_MainTex_ST]
+Vector 12 [unity_SHAb]
+Vector 11 [unity_SHAg]
+Vector 10 [unity_SHAr]
+Vector 15 [unity_SHBb]
+Vector 14 [unity_SHBg]
+Vector 13 [unity_SHBr]
+Vector 16 [unity_SHC]
+"vs_2_0
+def c19, 1, 0, 0, 0
+dcl_position v0
+dcl_normal v1
+dcl_texcoord v2
+dp4 oPos.x, c0, v0
+dp4 oPos.y, c1, v0
+dp4 oPos.z, c2, v0
+dp4 oPos.w, c3, v0
+mad oT0.xy, v2, c17, c17.zwzw
+mad oT0.zw, v2.xyxy, c18.xyxy, c18
+dp4 oT2.x, c4, v0
+dp4 oT2.y, c5, v0
+dp4 oT2.z, c6, v0
+mul r0.xyz, v1.y, c8
+mad r0.xyz, c7, v1.x, r0
+mad r0.xyz, c9, v1.z, r0
+nrm r1.xyz, r0
+mul r0.x, r1.y, r1.y
+mad r0.x, r1.x, r1.x, -r0.x
+mul r2, r1.yzzx, r1.xyzz
+dp4 r3.x, c13, r2
+dp4 r3.y, c14, r2
+dp4 r3.z, c15, r2
+mad r0.xyz, c16, r0.x, r3
+mov r1.w, c19.x
+dp4 r2.x, c10, r1
+dp4 r2.y, c11, r1
+dp4 r2.z, c12, r1
+mov oT1.xyz, r1
+add oT5.xyz, r0, r2
+mov oT4, c19.y
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 35 math
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "HDR_LIGHT_PREPASS_OFF" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 208
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityLighting" 720
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+BindCB  "UnityPerDraw" 2
+"vs_4_0
+root12:aaadaaaa
+eefiecedojnnnmhfdlefpnlhkbigghkkopebcpeeabaaaaaahaahaaaaadaaaaaa
+cmaaaaaaceabaaaanmabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+apaaaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaakeaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaakeaaaaaaaeaaaaaaaaaaaaaa
+adaaaaaaaeaaaaaaapaaaaaakeaaaaaaafaaaaaaaaaaaaaaadaaaaaaafaaaaaa
+ahaiaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklklfdeieefc
+imafaaaaeaaaabaagdabaaaafjaaaaaeegiocaaaaaaaaaaaamaaaaaafjaaaaae
+egiocaaaabaaaaaacnaaaaaafjaaaaaeegiocaaaacaaaaaabdaaaaaafpaaaaad
+pcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaafpaaaaaddcbabaaaadaaaaaa
+ghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaadpccabaaaabaaaaaagfaaaaad
+hccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaagfaaaaadpccabaaaaeaaaaaa
+gfaaaaadhccabaaaafaaaaaagiaaaaacaeaaaaaadiaaaaaipcaabaaaaaaaaaaa
+fgbfbaaaaaaaaaaaegiocaaaacaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaa
+egiocaaaacaaaaaaaaaaaaaaagbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaak
+pcaabaaaaaaaaaaaegiocaaaacaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaa
+aaaaaaaadcaaaaakpccabaaaaaaaaaaaegiocaaaacaaaaaaadaaaaaapgbpbaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaa
+egiacaaaaaaaaaaaakaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaalmccabaaa
+abaaaaaaagbebaaaadaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaaaaaaaaaa
+alaaaaaadiaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaa
+baaaaaaadiaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaa
+bbaaaaaadiaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaa
+bcaaaaaadiaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaa
+baaaaaaadiaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaa
+bbaaaaaadiaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaa
+bcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaa
+diaaaaaibcaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabaaaaaaa
+diaaaaaiccaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabbaaaaaa
+diaaaaaiecaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabcaaaaaa
+aaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaah
+icaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaa
+aaaaaaaadkaabaaaaaaaaaaadiaaaaahhcaabaaaaaaaaaaapgapbaaaaaaaaaaa
+egacbaaaaaaaaaaadgaaaaafhccabaaaacaaaaaaegacbaaaaaaaaaaadiaaaaai
+hcaabaaaabaaaaaafgbfbaaaaaaaaaaaegiccaaaacaaaaaaanaaaaaadcaaaaak
+hcaabaaaabaaaaaaegiccaaaacaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaa
+abaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaacaaaaaaaoaaaaaakgbkbaaa
+aaaaaaaaegacbaaaabaaaaaadcaaaaakhccabaaaadaaaaaaegiccaaaacaaaaaa
+apaaaaaapgbpbaaaaaaaaaaaegacbaaaabaaaaaadgaaaaaipccabaaaaeaaaaaa
+aceaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadiaaaaahbcaabaaaabaaaaaa
+bkaabaaaaaaaaaaabkaabaaaaaaaaaaadcaaaaakbcaabaaaabaaaaaaakaabaaa
+aaaaaaaaakaabaaaaaaaaaaaakaabaiaebaaaaaaabaaaaaadiaaaaahpcaabaaa
+acaaaaaajgacbaaaaaaaaaaaegakbaaaaaaaaaaabbaaaaaibcaabaaaadaaaaaa
+egiocaaaabaaaaaacjaaaaaaegaobaaaacaaaaaabbaaaaaiccaabaaaadaaaaaa
+egiocaaaabaaaaaackaaaaaaegaobaaaacaaaaaabbaaaaaiecaabaaaadaaaaaa
+egiocaaaabaaaaaaclaaaaaaegaobaaaacaaaaaadcaaaaakhcaabaaaabaaaaaa
+egiccaaaabaaaaaacmaaaaaaagaabaaaabaaaaaaegacbaaaadaaaaaadgaaaaaf
+icaabaaaaaaaaaaaabeaaaaaaaaaiadpbbaaaaaibcaabaaaacaaaaaaegiocaaa
+abaaaaaacgaaaaaaegaobaaaaaaaaaaabbaaaaaiccaabaaaacaaaaaaegiocaaa
+abaaaaaachaaaaaaegaobaaaaaaaaaaabbaaaaaiecaabaaaacaaaaaaegiocaaa
+abaaaaaaciaaaaaaegaobaaaaaaaaaaaaaaaaaahhccabaaaafaaaaaaegacbaaa
+abaaaaaaegacbaaaacaaaaaadoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 35 math
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "HDR_LIGHT_PREPASS_OFF" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 208
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityLighting" 720
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+BindCB  "UnityPerDraw" 2
+"vs_4_0_level_9_1
+root12:aaadaaaa
+eefiecedpjmmanlkeamgkopfoajpnlofceafoibfabaaaaaajaakaaaaaeaaaaaa
+daaaaaaaemadaaaaoaaiaaaaniajaaaaebgpgodjbeadaaaabeadaaaaaaacpopp
+lmacaaaafiaaaaaaaeaaceaaaaaafeaaaaaafeaaaaaaceaaabaafeaaaaaaakaa
+acaaabaaaaaaaaaaabaacgaaahaaadaaaaaaaaaaacaaaaaaaeaaakaaaaaaaaaa
+acaaamaaahaaaoaaaaaaaaaaaaaaaaaaaaacpoppfbaaaaafbfaaapkaaaaaiadp
+aaaaaaaaaaaaaaaaaaaaaaaabpaaaaacafaaaaiaaaaaapjabpaaaaacafaaacia
+acaaapjabpaaaaacafaaadiaadaaapjaaeaaaaaeaaaaadoaadaaoejaabaaoeka
+abaaookaaeaaaaaeaaaaamoaadaaeejaacaaeekaacaaoekaafaaaaadaaaaahia
+aaaaffjaapaaoekaaeaaaaaeaaaaahiaaoaaoekaaaaaaajaaaaaoeiaaeaaaaae
+aaaaahiabaaaoekaaaaakkjaaaaaoeiaaeaaaaaeacaaahoabbaaoekaaaaappja
+aaaaoeiaafaaaaadaaaaabiaacaaaajabcaaaakaafaaaaadaaaaaciaacaaaaja
+bdaaaakaafaaaaadaaaaaeiaacaaaajabeaaaakaafaaaaadabaaabiaacaaffja
+bcaaffkaafaaaaadabaaaciaacaaffjabdaaffkaafaaaaadabaaaeiaacaaffja
+beaaffkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaafaaaaadabaaabiaacaakkja
+bcaakkkaafaaaaadabaaaciaacaakkjabdaakkkaafaaaaadabaaaeiaacaakkja
+beaakkkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaceaaaaacabaaahiaaaaaoeia
+afaaaaadaaaaabiaabaaffiaabaaffiaaeaaaaaeaaaaabiaabaaaaiaabaaaaia
+aaaaaaibafaaaaadacaaapiaabaacjiaabaakeiaajaaaaadadaaabiaagaaoeka
+acaaoeiaajaaaaadadaaaciaahaaoekaacaaoeiaajaaaaadadaaaeiaaiaaoeka
+acaaoeiaaeaaaaaeaaaaahiaajaaoekaaaaaaaiaadaaoeiaabaaaaacabaaaiia
+bfaaaakaajaaaaadacaaabiaadaaoekaabaaoeiaajaaaaadacaaaciaaeaaoeka
+abaaoeiaajaaaaadacaaaeiaafaaoekaabaaoeiaabaaaaacabaaahoaabaaoeia
+acaaaaadaeaaahoaaaaaoeiaacaaoeiaafaaaaadaaaaapiaaaaaffjaalaaoeka
+aeaaaaaeaaaaapiaakaaoekaaaaaaajaaaaaoeiaaeaaaaaeaaaaapiaamaaoeka
+aaaakkjaaaaaoeiaaeaaaaaeaaaaapiaanaaoekaaaaappjaaaaaoeiaaeaaaaae
+aaaaadmaaaaappiaaaaaoekaaaaaoeiaabaaaaacaaaaammaaaaaoeiaabaaaaac
+adaaapoabfaaffkappppaaaafdeieefcimafaaaaeaaaabaagdabaaaafjaaaaae
+egiocaaaaaaaaaaaamaaaaaafjaaaaaeegiocaaaabaaaaaacnaaaaaafjaaaaae
+egiocaaaacaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaa
+acaaaaaafpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaa
+gfaaaaadpccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadhccabaaa
+adaaaaaagfaaaaadpccabaaaaeaaaaaagfaaaaadhccabaaaafaaaaaagiaaaaac
+aeaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaacaaaaaa
+abaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaacaaaaaaaaaaaaaaagbabaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaacaaaaaa
+acaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpccabaaaaaaaaaaa
+egiocaaaacaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaal
+dccabaaaabaaaaaaegbabaaaadaaaaaaegiacaaaaaaaaaaaakaaaaaaogikcaaa
+aaaaaaaaakaaaaaadcaaaaalmccabaaaabaaaaaaagbebaaaadaaaaaaagiecaaa
+aaaaaaaaalaaaaaakgiocaaaaaaaaaaaalaaaaaadiaaaaaibcaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaacaaaaaabaaaaaaadiaaaaaiccaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaacaaaaaabbaaaaaadiaaaaaiecaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaacaaaaaabcaaaaaadiaaaaaibcaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaacaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaacaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaacaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaa
+egacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaaibcaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaacaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaacaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaacaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaa
+aaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaaaaaaaaaa
+egacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaadiaaaaah
+hcaabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadgaaaaafhccabaaa
+acaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaaabaaaaaafgbfbaaaaaaaaaaa
+egiccaaaacaaaaaaanaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaacaaaaaa
+amaaaaaaagbabaaaaaaaaaaaegacbaaaabaaaaaadcaaaaakhcaabaaaabaaaaaa
+egiccaaaacaaaaaaaoaaaaaakgbkbaaaaaaaaaaaegacbaaaabaaaaaadcaaaaak
+hccabaaaadaaaaaaegiccaaaacaaaaaaapaaaaaapgbpbaaaaaaaaaaaegacbaaa
+abaaaaaadgaaaaaipccabaaaaeaaaaaaaceaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaadiaaaaahbcaabaaaabaaaaaabkaabaaaaaaaaaaabkaabaaaaaaaaaaa
+dcaaaaakbcaabaaaabaaaaaaakaabaaaaaaaaaaaakaabaaaaaaaaaaaakaabaia
+ebaaaaaaabaaaaaadiaaaaahpcaabaaaacaaaaaajgacbaaaaaaaaaaaegakbaaa
+aaaaaaaabbaaaaaibcaabaaaadaaaaaaegiocaaaabaaaaaacjaaaaaaegaobaaa
+acaaaaaabbaaaaaiccaabaaaadaaaaaaegiocaaaabaaaaaackaaaaaaegaobaaa
+acaaaaaabbaaaaaiecaabaaaadaaaaaaegiocaaaabaaaaaaclaaaaaaegaobaaa
+acaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaabaaaaaacmaaaaaaagaabaaa
+abaaaaaaegacbaaaadaaaaaadgaaaaaficaabaaaaaaaaaaaabeaaaaaaaaaiadp
+bbaaaaaibcaabaaaacaaaaaaegiocaaaabaaaaaacgaaaaaaegaobaaaaaaaaaaa
+bbaaaaaiccaabaaaacaaaaaaegiocaaaabaaaaaachaaaaaaegaobaaaaaaaaaaa
+bbaaaaaiecaabaaaacaaaaaaegiocaaaabaaaaaaciaaaaaaegaobaaaaaaaaaaa
+aaaaaaahhccabaaaafaaaaaaegacbaaaabaaaaaaegacbaaaacaaaaaadoaaaaab
+ejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaaaaaaaaaaaaaaaaaaadaaaaaa
+aaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapaaaaaa
+njaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaaahahaaaaoaaaaaaaaaaaaaaa
+aaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaaabaaaaaaaaaaaaaaadaaaaaa
+aeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaaadaaaaaaafaaaaaaapaaaaaa
+oaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaaapaaaaaaojaaaaaaaaaaaaaa
+aaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdejfeejepeoaafeebeoehefeofe
+aaeoepfcenebemaafeeffiedepepfceeaaedepemepfcaaklepfdeheolaaaaaaa
+agaaaaaaaiaaaaaajiaaaaaaaaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaa
+keaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapaaaaaakeaaaaaaabaaaaaa
+aaaaaaaaadaaaaaaacaaaaaaahaiaaaakeaaaaaaacaaaaaaaaaaaaaaadaaaaaa
+adaaaaaaahaiaaaakeaaaaaaaeaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaa
+keaaaaaaafaaaaaaaaaaaaaaadaaaaaaafaaaaaaahaiaaaafdfgfpfaepfdejfe
+ejepeoaafeeffiedepepfceeaaklklkl"
+}
+SubProgram "d3d9 " {
+// Stats: 29 math
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "UNITY_HDR_ON" }
+Bind "vertex" Vertex
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+Matrix 4 [_Object2World] 3
+Matrix 7 [_World2Object] 3
+Matrix 0 [glstate_matrix_mvp]
+Vector 18 [_Illum_ST]
+Vector 17 [_MainTex_ST]
+Vector 12 [unity_SHAb]
+Vector 11 [unity_SHAg]
+Vector 10 [unity_SHAr]
+Vector 15 [unity_SHBb]
+Vector 14 [unity_SHBg]
+Vector 13 [unity_SHBr]
+Vector 16 [unity_SHC]
+"vs_2_0
+def c19, 1, 0, 0, 0
+dcl_position v0
+dcl_normal v1
+dcl_texcoord v2
+dp4 oPos.x, c0, v0
+dp4 oPos.y, c1, v0
+dp4 oPos.z, c2, v0
+dp4 oPos.w, c3, v0
+mad oT0.xy, v2, c17, c17.zwzw
+mad oT0.zw, v2.xyxy, c18.xyxy, c18
+dp4 oT2.x, c4, v0
+dp4 oT2.y, c5, v0
+dp4 oT2.z, c6, v0
+mul r0.xyz, v1.y, c8
+mad r0.xyz, c7, v1.x, r0
+mad r0.xyz, c9, v1.z, r0
+nrm r1.xyz, r0
+mul r0.x, r1.y, r1.y
+mad r0.x, r1.x, r1.x, -r0.x
+mul r2, r1.yzzx, r1.xyzz
+dp4 r3.x, c13, r2
+dp4 r3.y, c14, r2
+dp4 r3.z, c15, r2
+mad r0.xyz, c16, r0.x, r3
+mov r1.w, c19.x
+dp4 r2.x, c10, r1
+dp4 r2.y, c11, r1
+dp4 r2.z, c12, r1
+mov oT1.xyz, r1
+add oT5.xyz, r0, r2
+mov oT4, c19.y
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 35 math
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "UNITY_HDR_ON" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 208
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityLighting" 720
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+BindCB  "UnityPerDraw" 2
+"vs_4_0
+root12:aaadaaaa
+eefiecedojnnnmhfdlefpnlhkbigghkkopebcpeeabaaaaaahaahaaaaadaaaaaa
+cmaaaaaaceabaaaanmabaaaaejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaanjaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaaoaaaaaaaaaaaaaaaaaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaa
+abaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaapaaaaaaoaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaa
+apaaaaaaojaaaaaaaaaaaaaaaaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdej
+feejepeoaafeebeoehefeofeaaeoepfcenebemaafeeffiedepepfceeaaedepem
+epfcaaklepfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaaaaaaaaaaabaaaaaa
+adaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+apaaaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaaahaiaaaakeaaaaaa
+acaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaiaaaakeaaaaaaaeaaaaaaaaaaaaaa
+adaaaaaaaeaaaaaaapaaaaaakeaaaaaaafaaaaaaaaaaaaaaadaaaaaaafaaaaaa
+ahaiaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfceeaaklklklfdeieefc
+imafaaaaeaaaabaagdabaaaafjaaaaaeegiocaaaaaaaaaaaamaaaaaafjaaaaae
+egiocaaaabaaaaaacnaaaaaafjaaaaaeegiocaaaacaaaaaabdaaaaaafpaaaaad
+pcbabaaaaaaaaaaafpaaaaadhcbabaaaacaaaaaafpaaaaaddcbabaaaadaaaaaa
+ghaaaaaepccabaaaaaaaaaaaabaaaaaagfaaaaadpccabaaaabaaaaaagfaaaaad
+hccabaaaacaaaaaagfaaaaadhccabaaaadaaaaaagfaaaaadpccabaaaaeaaaaaa
+gfaaaaadhccabaaaafaaaaaagiaaaaacaeaaaaaadiaaaaaipcaabaaaaaaaaaaa
+fgbfbaaaaaaaaaaaegiocaaaacaaaaaaabaaaaaadcaaaaakpcaabaaaaaaaaaaa
+egiocaaaacaaaaaaaaaaaaaaagbabaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaak
+pcaabaaaaaaaaaaaegiocaaaacaaaaaaacaaaaaakgbkbaaaaaaaaaaaegaobaaa
+aaaaaaaadcaaaaakpccabaaaaaaaaaaaegiocaaaacaaaaaaadaaaaaapgbpbaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaaldccabaaaabaaaaaaegbabaaaadaaaaaa
+egiacaaaaaaaaaaaakaaaaaaogikcaaaaaaaaaaaakaaaaaadcaaaaalmccabaaa
+abaaaaaaagbebaaaadaaaaaaagiecaaaaaaaaaaaalaaaaaakgiocaaaaaaaaaaa
+alaaaaaadiaaaaaibcaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaa
+baaaaaaadiaaaaaiccaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaa
+bbaaaaaadiaaaaaiecaabaaaaaaaaaaaakbabaaaacaaaaaaakiacaaaacaaaaaa
+bcaaaaaadiaaaaaibcaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaa
+baaaaaaadiaaaaaiccaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaa
+bbaaaaaadiaaaaaiecaabaaaabaaaaaabkbabaaaacaaaaaabkiacaaaacaaaaaa
+bcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaa
+diaaaaaibcaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabaaaaaaa
+diaaaaaiccaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabbaaaaaa
+diaaaaaiecaabaaaabaaaaaackbabaaaacaaaaaackiacaaaacaaaaaabcaaaaaa
+aaaaaaahhcaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaabaaaaaabaaaaaah
+icaabaaaaaaaaaaaegacbaaaaaaaaaaaegacbaaaaaaaaaaaeeaaaaaficaabaaa
+aaaaaaaadkaabaaaaaaaaaaadiaaaaahhcaabaaaaaaaaaaapgapbaaaaaaaaaaa
+egacbaaaaaaaaaaadgaaaaafhccabaaaacaaaaaaegacbaaaaaaaaaaadiaaaaai
+hcaabaaaabaaaaaafgbfbaaaaaaaaaaaegiccaaaacaaaaaaanaaaaaadcaaaaak
+hcaabaaaabaaaaaaegiccaaaacaaaaaaamaaaaaaagbabaaaaaaaaaaaegacbaaa
+abaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaacaaaaaaaoaaaaaakgbkbaaa
+aaaaaaaaegacbaaaabaaaaaadcaaaaakhccabaaaadaaaaaaegiccaaaacaaaaaa
+apaaaaaapgbpbaaaaaaaaaaaegacbaaaabaaaaaadgaaaaaipccabaaaaeaaaaaa
+aceaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadiaaaaahbcaabaaaabaaaaaa
+bkaabaaaaaaaaaaabkaabaaaaaaaaaaadcaaaaakbcaabaaaabaaaaaaakaabaaa
+aaaaaaaaakaabaaaaaaaaaaaakaabaiaebaaaaaaabaaaaaadiaaaaahpcaabaaa
+acaaaaaajgacbaaaaaaaaaaaegakbaaaaaaaaaaabbaaaaaibcaabaaaadaaaaaa
+egiocaaaabaaaaaacjaaaaaaegaobaaaacaaaaaabbaaaaaiccaabaaaadaaaaaa
+egiocaaaabaaaaaackaaaaaaegaobaaaacaaaaaabbaaaaaiecaabaaaadaaaaaa
+egiocaaaabaaaaaaclaaaaaaegaobaaaacaaaaaadcaaaaakhcaabaaaabaaaaaa
+egiccaaaabaaaaaacmaaaaaaagaabaaaabaaaaaaegacbaaaadaaaaaadgaaaaaf
+icaabaaaaaaaaaaaabeaaaaaaaaaiadpbbaaaaaibcaabaaaacaaaaaaegiocaaa
+abaaaaaacgaaaaaaegaobaaaaaaaaaaabbaaaaaiccaabaaaacaaaaaaegiocaaa
+abaaaaaachaaaaaaegaobaaaaaaaaaaabbaaaaaiecaabaaaacaaaaaaegiocaaa
+abaaaaaaciaaaaaaegaobaaaaaaaaaaaaaaaaaahhccabaaaafaaaaaaegacbaaa
+abaaaaaaegacbaaaacaaaaaadoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 35 math
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "UNITY_HDR_ON" }
+Bind "vertex" Vertex
+Bind "color" Color
+Bind "normal" Normal
+Bind "texcoord" TexCoord0
+ConstBuffer "$Globals" 208
+Vector 160 [_MainTex_ST]
+Vector 176 [_Illum_ST]
+ConstBuffer "UnityLighting" 720
+Vector 608 [unity_SHAr]
+Vector 624 [unity_SHAg]
+Vector 640 [unity_SHAb]
+Vector 656 [unity_SHBr]
+Vector 672 [unity_SHBg]
+Vector 688 [unity_SHBb]
+Vector 704 [unity_SHC]
+ConstBuffer "UnityPerDraw" 352
+Matrix 0 [glstate_matrix_mvp]
+Matrix 192 [_Object2World]
+Matrix 256 [_World2Object]
+BindCB  "$Globals" 0
+BindCB  "UnityLighting" 1
+BindCB  "UnityPerDraw" 2
+"vs_4_0_level_9_1
+root12:aaadaaaa
+eefiecedpjmmanlkeamgkopfoajpnlofceafoibfabaaaaaajaakaaaaaeaaaaaa
+daaaaaaaemadaaaaoaaiaaaaniajaaaaebgpgodjbeadaaaabeadaaaaaaacpopp
+lmacaaaafiaaaaaaaeaaceaaaaaafeaaaaaafeaaaaaaceaaabaafeaaaaaaakaa
+acaaabaaaaaaaaaaabaacgaaahaaadaaaaaaaaaaacaaaaaaaeaaakaaaaaaaaaa
+acaaamaaahaaaoaaaaaaaaaaaaaaaaaaaaacpoppfbaaaaafbfaaapkaaaaaiadp
+aaaaaaaaaaaaaaaaaaaaaaaabpaaaaacafaaaaiaaaaaapjabpaaaaacafaaacia
+acaaapjabpaaaaacafaaadiaadaaapjaaeaaaaaeaaaaadoaadaaoejaabaaoeka
+abaaookaaeaaaaaeaaaaamoaadaaeejaacaaeekaacaaoekaafaaaaadaaaaahia
+aaaaffjaapaaoekaaeaaaaaeaaaaahiaaoaaoekaaaaaaajaaaaaoeiaaeaaaaae
+aaaaahiabaaaoekaaaaakkjaaaaaoeiaaeaaaaaeacaaahoabbaaoekaaaaappja
+aaaaoeiaafaaaaadaaaaabiaacaaaajabcaaaakaafaaaaadaaaaaciaacaaaaja
+bdaaaakaafaaaaadaaaaaeiaacaaaajabeaaaakaafaaaaadabaaabiaacaaffja
+bcaaffkaafaaaaadabaaaciaacaaffjabdaaffkaafaaaaadabaaaeiaacaaffja
+beaaffkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaafaaaaadabaaabiaacaakkja
+bcaakkkaafaaaaadabaaaciaacaakkjabdaakkkaafaaaaadabaaaeiaacaakkja
+beaakkkaacaaaaadaaaaahiaaaaaoeiaabaaoeiaceaaaaacabaaahiaaaaaoeia
+afaaaaadaaaaabiaabaaffiaabaaffiaaeaaaaaeaaaaabiaabaaaaiaabaaaaia
+aaaaaaibafaaaaadacaaapiaabaacjiaabaakeiaajaaaaadadaaabiaagaaoeka
+acaaoeiaajaaaaadadaaaciaahaaoekaacaaoeiaajaaaaadadaaaeiaaiaaoeka
+acaaoeiaaeaaaaaeaaaaahiaajaaoekaaaaaaaiaadaaoeiaabaaaaacabaaaiia
+bfaaaakaajaaaaadacaaabiaadaaoekaabaaoeiaajaaaaadacaaaciaaeaaoeka
+abaaoeiaajaaaaadacaaaeiaafaaoekaabaaoeiaabaaaaacabaaahoaabaaoeia
+acaaaaadaeaaahoaaaaaoeiaacaaoeiaafaaaaadaaaaapiaaaaaffjaalaaoeka
+aeaaaaaeaaaaapiaakaaoekaaaaaaajaaaaaoeiaaeaaaaaeaaaaapiaamaaoeka
+aaaakkjaaaaaoeiaaeaaaaaeaaaaapiaanaaoekaaaaappjaaaaaoeiaaeaaaaae
+aaaaadmaaaaappiaaaaaoekaaaaaoeiaabaaaaacaaaaammaaaaaoeiaabaaaaac
+adaaapoabfaaffkappppaaaafdeieefcimafaaaaeaaaabaagdabaaaafjaaaaae
+egiocaaaaaaaaaaaamaaaaaafjaaaaaeegiocaaaabaaaaaacnaaaaaafjaaaaae
+egiocaaaacaaaaaabdaaaaaafpaaaaadpcbabaaaaaaaaaaafpaaaaadhcbabaaa
+acaaaaaafpaaaaaddcbabaaaadaaaaaaghaaaaaepccabaaaaaaaaaaaabaaaaaa
+gfaaaaadpccabaaaabaaaaaagfaaaaadhccabaaaacaaaaaagfaaaaadhccabaaa
+adaaaaaagfaaaaadpccabaaaaeaaaaaagfaaaaadhccabaaaafaaaaaagiaaaaac
+aeaaaaaadiaaaaaipcaabaaaaaaaaaaafgbfbaaaaaaaaaaaegiocaaaacaaaaaa
+abaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaacaaaaaaaaaaaaaaagbabaaa
+aaaaaaaaegaobaaaaaaaaaaadcaaaaakpcaabaaaaaaaaaaaegiocaaaacaaaaaa
+acaaaaaakgbkbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaakpccabaaaaaaaaaaa
+egiocaaaacaaaaaaadaaaaaapgbpbaaaaaaaaaaaegaobaaaaaaaaaaadcaaaaal
+dccabaaaabaaaaaaegbabaaaadaaaaaaegiacaaaaaaaaaaaakaaaaaaogikcaaa
+aaaaaaaaakaaaaaadcaaaaalmccabaaaabaaaaaaagbebaaaadaaaaaaagiecaaa
+aaaaaaaaalaaaaaakgiocaaaaaaaaaaaalaaaaaadiaaaaaibcaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaacaaaaaabaaaaaaadiaaaaaiccaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaacaaaaaabbaaaaaadiaaaaaiecaabaaaaaaaaaaa
+akbabaaaacaaaaaaakiacaaaacaaaaaabcaaaaaadiaaaaaibcaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaacaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaacaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaa
+bkbabaaaacaaaaaabkiacaaaacaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaa
+egacbaaaaaaaaaaaegacbaaaabaaaaaadiaaaaaibcaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaacaaaaaabaaaaaaadiaaaaaiccaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaacaaaaaabbaaaaaadiaaaaaiecaabaaaabaaaaaackbabaaa
+acaaaaaackiacaaaacaaaaaabcaaaaaaaaaaaaahhcaabaaaaaaaaaaaegacbaaa
+aaaaaaaaegacbaaaabaaaaaabaaaaaahicaabaaaaaaaaaaaegacbaaaaaaaaaaa
+egacbaaaaaaaaaaaeeaaaaaficaabaaaaaaaaaaadkaabaaaaaaaaaaadiaaaaah
+hcaabaaaaaaaaaaapgapbaaaaaaaaaaaegacbaaaaaaaaaaadgaaaaafhccabaaa
+acaaaaaaegacbaaaaaaaaaaadiaaaaaihcaabaaaabaaaaaafgbfbaaaaaaaaaaa
+egiccaaaacaaaaaaanaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaacaaaaaa
+amaaaaaaagbabaaaaaaaaaaaegacbaaaabaaaaaadcaaaaakhcaabaaaabaaaaaa
+egiccaaaacaaaaaaaoaaaaaakgbkbaaaaaaaaaaaegacbaaaabaaaaaadcaaaaak
+hccabaaaadaaaaaaegiccaaaacaaaaaaapaaaaaapgbpbaaaaaaaaaaaegacbaaa
+abaaaaaadgaaaaaipccabaaaaeaaaaaaaceaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaadiaaaaahbcaabaaaabaaaaaabkaabaaaaaaaaaaabkaabaaaaaaaaaaa
+dcaaaaakbcaabaaaabaaaaaaakaabaaaaaaaaaaaakaabaaaaaaaaaaaakaabaia
+ebaaaaaaabaaaaaadiaaaaahpcaabaaaacaaaaaajgacbaaaaaaaaaaaegakbaaa
+aaaaaaaabbaaaaaibcaabaaaadaaaaaaegiocaaaabaaaaaacjaaaaaaegaobaaa
+acaaaaaabbaaaaaiccaabaaaadaaaaaaegiocaaaabaaaaaackaaaaaaegaobaaa
+acaaaaaabbaaaaaiecaabaaaadaaaaaaegiocaaaabaaaaaaclaaaaaaegaobaaa
+acaaaaaadcaaaaakhcaabaaaabaaaaaaegiccaaaabaaaaaacmaaaaaaagaabaaa
+abaaaaaaegacbaaaadaaaaaadgaaaaaficaabaaaaaaaaaaaabeaaaaaaaaaiadp
+bbaaaaaibcaabaaaacaaaaaaegiocaaaabaaaaaacgaaaaaaegaobaaaaaaaaaaa
+bbaaaaaiccaabaaaacaaaaaaegiocaaaabaaaaaachaaaaaaegaobaaaaaaaaaaa
+bbaaaaaiecaabaaaacaaaaaaegiocaaaabaaaaaaciaaaaaaegaobaaaaaaaaaaa
+aaaaaaahhccabaaaafaaaaaaegacbaaaabaaaaaaegacbaaaacaaaaaadoaaaaab
+ejfdeheopaaaaaaaaiaaaaaaaiaaaaaamiaaaaaaaaaaaaaaaaaaaaaaadaaaaaa
+aaaaaaaaapapaaaanbaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapaaaaaa
+njaaaaaaaaaaaaaaaaaaaaaaadaaaaaaacaaaaaaahahaaaaoaaaaaaaaaaaaaaa
+aaaaaaaaadaaaaaaadaaaaaaapadaaaaoaaaaaaaabaaaaaaaaaaaaaaadaaaaaa
+aeaaaaaaapaaaaaaoaaaaaaaacaaaaaaaaaaaaaaadaaaaaaafaaaaaaapaaaaaa
+oaaaaaaaadaaaaaaaaaaaaaaadaaaaaaagaaaaaaapaaaaaaojaaaaaaaaaaaaaa
+aaaaaaaaadaaaaaaahaaaaaaapaaaaaafaepfdejfeejepeoaafeebeoehefeofe
+aaeoepfcenebemaafeeffiedepepfceeaaedepemepfcaaklepfdeheolaaaaaaa
+agaaaaaaaiaaaaaajiaaaaaaaaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaa
+keaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapaaaaaakeaaaaaaabaaaaaa
+aaaaaaaaadaaaaaaacaaaaaaahaiaaaakeaaaaaaacaaaaaaaaaaaaaaadaaaaaa
+adaaaaaaahaiaaaakeaaaaaaaeaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaa
+keaaaaaaafaaaaaaaaaaaaaaadaaaaaaafaaaaaaahaiaaaafdfgfpfaepfdejfe
+ejepeoaafeeffiedepepfceeaaklklkl"
+}
+}
+Program "fp" {
+SubProgram "d3d9 " {
+// Stats: 17 math, 2 textures
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "HDR_LIGHT_PREPASS_OFF" }
+Vector 0 [_Color]
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+"ps_2_0
+def c1, 1, 0, 0.5, 0
+dcl t0
+dcl_pp t1.xyz
+dcl_pp t5.xyz
+dcl_2d s0
+dcl_2d s1
+mov r0.x, t0.z
+mov r0.y, t0.w
+texld_pp r1, t0, s0
+texld r0, r0, s1
+mov_pp r2.w, c1.x
+mul_pp r2.xyz, r1, c0
+mov_pp oC0, r2
+mov_pp r1, c1.y
+mov_pp oC1, r1
+mad_pp r1.xyz, t1, c1.z, c1.z
+mov_pp r1.w, c1.x
+mov_pp oC2, r1
+mul_pp r0.xyz, r2, t5
+mad_pp r0.xyz, r2, r0.w, r0
+exp_pp r1.x, -r0.x
+exp_pp r1.y, -r0.y
+exp_pp r1.z, -r0.z
+mov_pp r1.w, c1.x
+mov_pp oC3, r1
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 5 math, 2 textures
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "HDR_LIGHT_PREPASS_OFF" }
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+ConstBuffer "$Globals" 208
+Vector 144 [_Color]
+BindCB  "$Globals" 0
+"ps_4_0
+root12:acabacaa
+eefiecedfghoncoimffnopcpajcnekhhgboflnaiabaaaaaaieadaaaaadaaaaaa
+cmaaaaaaoeaaaaaagaabaaaaejfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapapaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaakeaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaaaaaakeaaaaaa
+aeaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaakeaaaaaaafaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaahahaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfcee
+aaklklklepfdeheoheaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaaaaaaaaaapaaaaaagiaaaaaaabaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+apaaaaaagiaaaaaaacaaaaaaaaaaaaaaadaaaaaaacaaaaaaapaaaaaagiaaaaaa
+adaaaaaaaaaaaaaaadaaaaaaadaaaaaaapaaaaaafdfgfpfegbhcghgfheaaklkl
+fdeieefcbmacaaaaeaaaaaaaihaaaaaafjaaaaaeegiocaaaaaaaaaaaakaaaaaa
+fkaaaaadaagabaaaaaaaaaaafkaaaaadaagabaaaabaaaaaafibiaaaeaahabaaa
+aaaaaaaaffffaaaafibiaaaeaahabaaaabaaaaaaffffaaaagcbaaaadpcbabaaa
+abaaaaaagcbaaaadhcbabaaaacaaaaaagcbaaaadhcbabaaaafaaaaaagfaaaaad
+pccabaaaaaaaaaaagfaaaaadpccabaaaabaaaaaagfaaaaadpccabaaaacaaaaaa
+gfaaaaadpccabaaaadaaaaaagiaaaaacadaaaaaadgaaaaaficcabaaaaaaaaaaa
+abeaaaaaaaaaiadpefaaaaajpcaabaaaaaaaaaaaegbabaaaabaaaaaaeghobaaa
+aaaaaaaaaagabaaaaaaaaaaadiaaaaaihcaabaaaaaaaaaaaegacbaaaaaaaaaaa
+egiccaaaaaaaaaaaajaaaaaadgaaaaafhccabaaaaaaaaaaaegacbaaaaaaaaaaa
+dgaaaaaipccabaaaabaaaaaaaceaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+dcaaaaaphccabaaaacaaaaaaegbcbaaaacaaaaaaaceaaaaaaaaaaadpaaaaaadp
+aaaaaadpaaaaaaaaaceaaaaaaaaaaadpaaaaaadpaaaaaadpaaaaaaaadgaaaaaf
+iccabaaaacaaaaaaabeaaaaaaaaaiadpdiaaaaahhcaabaaaabaaaaaaegacbaaa
+aaaaaaaaegbcbaaaafaaaaaaefaaaaajpcaabaaaacaaaaaaogbkbaaaabaaaaaa
+eghobaaaabaaaaaaaagabaaaabaaaaaadcaaaaajhcaabaaaaaaaaaaaegacbaaa
+aaaaaaaapgapbaaaacaaaaaaegacbaaaabaaaaaabjaaaaaghccabaaaadaaaaaa
+egacbaiaebaaaaaaaaaaaaaadgaaaaaficcabaaaadaaaaaaabeaaaaaaaaaiadp
+doaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 5 math, 2 textures
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "HDR_LIGHT_PREPASS_OFF" }
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+ConstBuffer "$Globals" 208
+Vector 144 [_Color]
+BindCB  "$Globals" 0
+"ps_4_0_level_9_1
+root12:acabacaa
+eefiecednbjmemomafhpmobcaiogoddjjfmfkbfgabaaaaaaciafaaaaaeaaaaaa
+daaaaaaanaabaaaapeadaaaakmaeaaaaebgpgodjjiabaaaajiabaaaaaaacpppp
+gaabaaaadiaaaaaaabaacmaaaaaadiaaaaaadiaaacaaceaaaaaadiaaaaaaaaaa
+abababaaaaaaajaaabaaaaaaaaaaaaaaaaacppppfbaaaaafabaaapkaaaaaiadp
+aaaaaaaaaaaaaadpaaaaaaaabpaaaaacaaaaaaiaaaaaaplabpaaaaacaaaaaaia
+abaachlabpaaaaacaaaaaaiaaeaachlabpaaaaacaaaaaajaaaaiapkabpaaaaac
+aaaaaajaabaiapkaabaaaaacaaaaabiaaaaakklaabaaaaacaaaaaciaaaaappla
+ecaaaaadabaacpiaaaaaoelaaaaioekaecaaaaadaaaaapiaaaaaoeiaabaioeka
+abaaaaacacaaciiaabaaaakaafaaaaadacaachiaabaaoeiaaaaaoekaabaaaaac
+aaaicpiaacaaoeiaabaaaaacabaacpiaabaaffkaabaaaaacabaicpiaabaaoeia
+aeaaaaaeabaachiaabaaoelaabaakkkaabaakkkaabaaaaacabaaciiaabaaaaka
+abaaaaacacaicpiaabaaoeiaafaaaaadaaaachiaacaaoeiaaeaaoelaaeaaaaae
+aaaachiaacaaoeiaaaaappiaaaaaoeiaaoaaaaacabaacbiaaaaaaaibaoaaaaac
+abaacciaaaaaffibaoaaaaacabaaceiaaaaakkibabaaaaacabaaciiaabaaaaka
+abaaaaacadaicpiaabaaoeiappppaaaafdeieefcbmacaaaaeaaaaaaaihaaaaaa
+fjaaaaaeegiocaaaaaaaaaaaakaaaaaafkaaaaadaagabaaaaaaaaaaafkaaaaad
+aagabaaaabaaaaaafibiaaaeaahabaaaaaaaaaaaffffaaaafibiaaaeaahabaaa
+abaaaaaaffffaaaagcbaaaadpcbabaaaabaaaaaagcbaaaadhcbabaaaacaaaaaa
+gcbaaaadhcbabaaaafaaaaaagfaaaaadpccabaaaaaaaaaaagfaaaaadpccabaaa
+abaaaaaagfaaaaadpccabaaaacaaaaaagfaaaaadpccabaaaadaaaaaagiaaaaac
+adaaaaaadgaaaaaficcabaaaaaaaaaaaabeaaaaaaaaaiadpefaaaaajpcaabaaa
+aaaaaaaaegbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaaaaaaaaaadiaaaaai
+hcaabaaaaaaaaaaaegacbaaaaaaaaaaaegiccaaaaaaaaaaaajaaaaaadgaaaaaf
+hccabaaaaaaaaaaaegacbaaaaaaaaaaadgaaaaaipccabaaaabaaaaaaaceaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadcaaaaaphccabaaaacaaaaaaegbcbaaa
+acaaaaaaaceaaaaaaaaaaadpaaaaaadpaaaaaadpaaaaaaaaaceaaaaaaaaaaadp
+aaaaaadpaaaaaadpaaaaaaaadgaaaaaficcabaaaacaaaaaaabeaaaaaaaaaiadp
+diaaaaahhcaabaaaabaaaaaaegacbaaaaaaaaaaaegbcbaaaafaaaaaaefaaaaaj
+pcaabaaaacaaaaaaogbkbaaaabaaaaaaeghobaaaabaaaaaaaagabaaaabaaaaaa
+dcaaaaajhcaabaaaaaaaaaaaegacbaaaaaaaaaaapgapbaaaacaaaaaaegacbaaa
+abaaaaaabjaaaaaghccabaaaadaaaaaaegacbaiaebaaaaaaaaaaaaaadgaaaaaf
+iccabaaaadaaaaaaabeaaaaaaaaaiadpdoaaaaabejfdeheolaaaaaaaagaaaaaa
+aiaaaaaajiaaaaaaaaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaakeaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapapaaaakeaaaaaaabaaaaaaaaaaaaaa
+adaaaaaaacaaaaaaahahaaaakeaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaa
+ahaaaaaakeaaaaaaaeaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaakeaaaaaa
+afaaaaaaaaaaaaaaadaaaaaaafaaaaaaahahaaaafdfgfpfaepfdejfeejepeoaa
+feeffiedepepfceeaaklklklepfdeheoheaaaaaaaeaaaaaaaiaaaaaagiaaaaaa
+aaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapaaaaaagiaaaaaaabaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapaaaaaagiaaaaaaacaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+apaaaaaagiaaaaaaadaaaaaaaaaaaaaaadaaaaaaadaaaaaaapaaaaaafdfgfpfe
+gbhcghgfheaaklkl"
+}
+SubProgram "d3d9 " {
+// Stats: 14 math, 2 textures
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "UNITY_HDR_ON" }
+Vector 0 [_Color]
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+"ps_2_0
+def c1, 1, 0, 0.5, 0
+dcl t0
+dcl_pp t1.xyz
+dcl_pp t5.xyz
+dcl_2d s0
+dcl_2d s1
+mov r0.x, t0.z
+mov r0.y, t0.w
+texld_pp r1, t0, s0
+texld r0, r0, s1
+mov_pp r2.w, c1.x
+mul_pp r2.xyz, r1, c0
+mov_pp oC0, r2
+mov_pp r1, c1.y
+mov_pp oC1, r1
+mad_pp r1.xyz, t1, c1.z, c1.z
+mov_pp r1.w, c1.x
+mov_pp oC2, r1
+mul_pp r0.xyz, r2, t5
+mad_pp r0.xyz, r2, r0.w, r0
+mov_pp r0.w, c1.x
+mov_pp oC3, r0
+
+"
+}
+SubProgram "d3d11 " {
+// Stats: 4 math, 2 textures
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "UNITY_HDR_ON" }
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+ConstBuffer "$Globals" 208
+Vector 144 [_Color]
+BindCB  "$Globals" 0
+"ps_4_0
+root12:acabacaa
+eefiecedcmkephpcegfomjibldkklnmdlmlieipbabaaaaaagmadaaaaadaaaaaa
+cmaaaaaaoeaaaaaagaabaaaaejfdeheolaaaaaaaagaaaaaaaiaaaaaajiaaaaaa
+aaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaakeaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaabaaaaaaapapaaaakeaaaaaaabaaaaaaaaaaaaaaadaaaaaaacaaaaaa
+ahahaaaakeaaaaaaacaaaaaaaaaaaaaaadaaaaaaadaaaaaaahaaaaaakeaaaaaa
+aeaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaakeaaaaaaafaaaaaaaaaaaaaa
+adaaaaaaafaaaaaaahahaaaafdfgfpfaepfdejfeejepeoaafeeffiedepepfcee
+aaklklklepfdeheoheaaaaaaaeaaaaaaaiaaaaaagiaaaaaaaaaaaaaaaaaaaaaa
+adaaaaaaaaaaaaaaapaaaaaagiaaaaaaabaaaaaaaaaaaaaaadaaaaaaabaaaaaa
+apaaaaaagiaaaaaaacaaaaaaaaaaaaaaadaaaaaaacaaaaaaapaaaaaagiaaaaaa
+adaaaaaaaaaaaaaaadaaaaaaadaaaaaaapaaaaaafdfgfpfegbhcghgfheaaklkl
+fdeieefcaeacaaaaeaaaaaaaibaaaaaafjaaaaaeegiocaaaaaaaaaaaakaaaaaa
+fkaaaaadaagabaaaaaaaaaaafkaaaaadaagabaaaabaaaaaafibiaaaeaahabaaa
+aaaaaaaaffffaaaafibiaaaeaahabaaaabaaaaaaffffaaaagcbaaaadpcbabaaa
+abaaaaaagcbaaaadhcbabaaaacaaaaaagcbaaaadhcbabaaaafaaaaaagfaaaaad
+pccabaaaaaaaaaaagfaaaaadpccabaaaabaaaaaagfaaaaadpccabaaaacaaaaaa
+gfaaaaadpccabaaaadaaaaaagiaaaaacadaaaaaadgaaaaaficcabaaaaaaaaaaa
+abeaaaaaaaaaiadpefaaaaajpcaabaaaaaaaaaaaegbabaaaabaaaaaaeghobaaa
+aaaaaaaaaagabaaaaaaaaaaadiaaaaaihcaabaaaaaaaaaaaegacbaaaaaaaaaaa
+egiccaaaaaaaaaaaajaaaaaadgaaaaafhccabaaaaaaaaaaaegacbaaaaaaaaaaa
+dgaaaaaipccabaaaabaaaaaaaceaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+dcaaaaaphccabaaaacaaaaaaegbcbaaaacaaaaaaaceaaaaaaaaaaadpaaaaaadp
+aaaaaadpaaaaaaaaaceaaaaaaaaaaadpaaaaaadpaaaaaadpaaaaaaaadgaaaaaf
+iccabaaaacaaaaaaabeaaaaaaaaaiadpdiaaaaahhcaabaaaabaaaaaaegacbaaa
+aaaaaaaaegbcbaaaafaaaaaaefaaaaajpcaabaaaacaaaaaaogbkbaaaabaaaaaa
+eghobaaaabaaaaaaaagabaaaabaaaaaadcaaaaajhccabaaaadaaaaaaegacbaaa
+aaaaaaaapgapbaaaacaaaaaaegacbaaaabaaaaaadgaaaaaficcabaaaadaaaaaa
+abeaaaaaaaaaiadpdoaaaaab"
+}
+SubProgram "d3d11_9x " {
+// Stats: 4 math, 2 textures
+Keywords { "LIGHTMAP_OFF" "DIRLIGHTMAP_OFF" "DYNAMICLIGHTMAP_OFF" "UNITY_HDR_ON" }
+SetTexture 0 [_MainTex] 2D 0
+SetTexture 1 [_Illum] 2D 1
+ConstBuffer "$Globals" 208
+Vector 144 [_Color]
+BindCB  "$Globals" 0
+"ps_4_0_level_9_1
+root12:acabacaa
+eefiecedhnfmkafgidachkhhpipeaoeglfdflpplabaaaaaaomaeaaaaaeaaaaaa
+daaaaaaakmabaaaaliadaaaahaaeaaaaebgpgodjheabaaaaheabaaaaaaacpppp
+dmabaaaadiaaaaaaabaacmaaaaaadiaaaaaadiaaacaaceaaaaaadiaaaaaaaaaa
+abababaaaaaaajaaabaaaaaaaaaaaaaaaaacppppfbaaaaafabaaapkaaaaaiadp
+aaaaaaaaaaaaaadpaaaaaaaabpaaaaacaaaaaaiaaaaaaplabpaaaaacaaaaaaia
+abaachlabpaaaaacaaaaaaiaaeaachlabpaaaaacaaaaaajaaaaiapkabpaaaaac
+aaaaaajaabaiapkaabaaaaacaaaaabiaaaaakklaabaaaaacaaaaaciaaaaappla
+ecaaaaadabaacpiaaaaaoelaaaaioekaecaaaaadaaaaapiaaaaaoeiaabaioeka
+abaaaaacacaaciiaabaaaakaafaaaaadacaachiaabaaoeiaaaaaoekaabaaaaac
+aaaicpiaacaaoeiaabaaaaacabaacpiaabaaffkaabaaaaacabaicpiaabaaoeia
+aeaaaaaeabaachiaabaaoelaabaakkkaabaakkkaabaaaaacabaaciiaabaaaaka
+abaaaaacacaicpiaabaaoeiaafaaaaadaaaachiaacaaoeiaaeaaoelaaeaaaaae
+aaaachiaacaaoeiaaaaappiaaaaaoeiaabaaaaacaaaaciiaabaaaakaabaaaaac
+adaicpiaaaaaoeiappppaaaafdeieefcaeacaaaaeaaaaaaaibaaaaaafjaaaaae
+egiocaaaaaaaaaaaakaaaaaafkaaaaadaagabaaaaaaaaaaafkaaaaadaagabaaa
+abaaaaaafibiaaaeaahabaaaaaaaaaaaffffaaaafibiaaaeaahabaaaabaaaaaa
+ffffaaaagcbaaaadpcbabaaaabaaaaaagcbaaaadhcbabaaaacaaaaaagcbaaaad
+hcbabaaaafaaaaaagfaaaaadpccabaaaaaaaaaaagfaaaaadpccabaaaabaaaaaa
+gfaaaaadpccabaaaacaaaaaagfaaaaadpccabaaaadaaaaaagiaaaaacadaaaaaa
+dgaaaaaficcabaaaaaaaaaaaabeaaaaaaaaaiadpefaaaaajpcaabaaaaaaaaaaa
+egbabaaaabaaaaaaeghobaaaaaaaaaaaaagabaaaaaaaaaaadiaaaaaihcaabaaa
+aaaaaaaaegacbaaaaaaaaaaaegiccaaaaaaaaaaaajaaaaaadgaaaaafhccabaaa
+aaaaaaaaegacbaaaaaaaaaaadgaaaaaipccabaaaabaaaaaaaceaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaadcaaaaaphccabaaaacaaaaaaegbcbaaaacaaaaaa
+aceaaaaaaaaaaadpaaaaaadpaaaaaadpaaaaaaaaaceaaaaaaaaaaadpaaaaaadp
+aaaaaadpaaaaaaaadgaaaaaficcabaaaacaaaaaaabeaaaaaaaaaiadpdiaaaaah
+hcaabaaaabaaaaaaegacbaaaaaaaaaaaegbcbaaaafaaaaaaefaaaaajpcaabaaa
+acaaaaaaogbkbaaaabaaaaaaeghobaaaabaaaaaaaagabaaaabaaaaaadcaaaaaj
+hccabaaaadaaaaaaegacbaaaaaaaaaaapgapbaaaacaaaaaaegacbaaaabaaaaaa
+dgaaaaaficcabaaaadaaaaaaabeaaaaaaaaaiadpdoaaaaabejfdeheolaaaaaaa
+agaaaaaaaiaaaaaajiaaaaaaaaaaaaaaabaaaaaaadaaaaaaaaaaaaaaapaaaaaa
+keaaaaaaaaaaaaaaaaaaaaaaadaaaaaaabaaaaaaapapaaaakeaaaaaaabaaaaaa
+aaaaaaaaadaaaaaaacaaaaaaahahaaaakeaaaaaaacaaaaaaaaaaaaaaadaaaaaa
+adaaaaaaahaaaaaakeaaaaaaaeaaaaaaaaaaaaaaadaaaaaaaeaaaaaaapaaaaaa
+keaaaaaaafaaaaaaaaaaaaaaadaaaaaaafaaaaaaahahaaaafdfgfpfaepfdejfe
+ejepeoaafeeffiedepepfceeaaklklklepfdeheoheaaaaaaaeaaaaaaaiaaaaaa
+giaaaaaaaaaaaaaaaaaaaaaaadaaaaaaaaaaaaaaapaaaaaagiaaaaaaabaaaaaa
+aaaaaaaaadaaaaaaabaaaaaaapaaaaaagiaaaaaaacaaaaaaaaaaaaaaadaaaaaa
+acaaaaaaapaaaaaagiaaaaaaadaaaaaaaaaaaaaaadaaaaaaadaaaaaaapaaaaaa
+fdfgfpfegbhcghgfheaaklkl"
+}
+}
+ }
+}
+Fallback "Legacy Shaders/Self-Illumin/VertexLit"
+}
